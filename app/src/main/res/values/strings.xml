@@ -11,4 +11,7 @@
     <string name="filing_status">Filing Status</string>
     <string name="hourly_rate">Hourly Pay Rate</string>
     <string name="hours_worked">Hours Worked</string>
+    <string name="social_security">Social Security Tax</string>
+    <string name="medicare">Medicare Tax</string>
+    <string name="federal">Federal Tax</string>
 </resources>
