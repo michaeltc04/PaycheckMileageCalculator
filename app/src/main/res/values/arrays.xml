@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="filing_status_array">
+        <item>Single</item>
+        <item>Joint</item>
+        <item>Married</item>
+        <item>Head</item>
+    </string-array>
+</resources>

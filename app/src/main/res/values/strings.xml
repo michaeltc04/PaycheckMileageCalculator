@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">PaycheckMileageCalculator</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="allowances">Allowances</string>
+    <string name="gross_pay">Gross Yearly Pay</string>
+    <string name="num_paychecks"># of Paychecks (YTD)</string>
+    <string name="withholding">Withholding</string>
+    <string name="filing_status">Filing Status</string>
+    <string name="hourly_rate">Hourly Pay Rate</string>
+    <string name="hours_worked">Hours Worked</string>
+</resources>

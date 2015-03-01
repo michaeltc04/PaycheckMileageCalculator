@@ -1,0 +1,115 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context="com.michaelt.paycheckmileagecalculator.salaryFragment"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp">
+
+    ///////////////Indentation Views///////////////
+    <View
+        android:id="@+id/left_indentation_view"
+        android:layout_width="50dp"
+        android:layout_height="0dp"/>
+    <View
+        android:id="@+id/right_indentation_view"
+        android:layout_width="70dp"
+        android:layout_height="0dp"
+        android:layout_alignParentRight="true"/>
+
+    ///////////////Gross Pay///////////////
+    <TextView
+        android:id="@+id/gross_pay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/gross_pay"
+        android:layout_toRightOf="@+id/left_indentation_view"
+        android:layout_marginBottom="12dp"/>
+        //android:background="#ff00BB00"/>
+    <EditText
+        android:id="@+id/edit_gross_pay"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignTop="@+id/gross_pay"
+        android:gravity="right"
+        android:background="#ffa4a4a4"/>
+        //android:text="100000"
+
+    ///////////////Paychecks Remaining///////////////
+    <TextView
+        android:id="@+id/num_paychecks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/num_paychecks"
+        android:layout_below="@+id/gross_pay"
+        android:layout_alignLeft="@+id/gross_pay"
+        android:layout_marginBottom="12dp"/>
+        //android:background="#ff00BBFF"/>
+    <EditText
+        android:id="@+id/edit_num_paychecks"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignTop="@+id/num_paychecks"
+        android:gravity="right"
+        android:background="#ffa4a4a4"/>
+        //android:text="3"
+
+    ///////////////Filing Status///////////////
+    <TextView
+        android:id="@+id/filing_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/filing_status"
+        android:layout_below="@+id/num_paychecks"
+        android:layout_alignLeft="@+id/gross_pay"
+        android:layout_marginBottom="12dp"/>
+        //android:background="#ff00BB00"/>
+    <Spinner
+        android:id="@+id/filing_status_spinner"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignTop="@+id/filing_status"
+        android:background="#ff008800"/>
+
+    ///////////////Withholding///////////////
+    <TextView
+        android:id="@+id/withholding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/withholding"
+        android:layout_below="@+id/filing_status"
+        android:layout_alignLeft="@+id/gross_pay"
+        android:layout_marginBottom="12dp"/>
+        //android:background="#ff00BBFF"/>
+    <EditText
+        android:id="@+id/edit_withholding"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignTop="@+id/withholding"
+        android:gravity="right"
+        android:background="#ffa4a4a4"/>
+        //android:text="2"
+
+    ///////////////Allowances///////////////
+    <TextView
+        android:id="@+id/allowances"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/allowances"
+        android:layout_below="@+id/withholding"
+        android:layout_alignLeft="@+id/gross_pay"/>
+        //android:background="#ff00BB00"/>
+    <EditText
+        android:id="@+id/edit_allowances"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignTop="@+id/allowances"
+        android:gravity="right"
+        android:background="#ffa4a4a4"/>
+        //android:text="30"
+
+</RelativeLayout>
