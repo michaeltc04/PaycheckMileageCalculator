@@ -11,4 +11,5 @@
     <string name="filing_status">Filing Status</string>
     <string name="hourly_rate">Hourly Pay Rate</string>
     <string name="hours_worked">Hours Worked</string>
+    <string name="test">Test</string>
 </resources>
