@@ -84,7 +84,7 @@
         android:layout_alignRight="@+id/edit_withholding"
         android:layout_alignEnd="@+id/edit_withholding" />
 
-    ///////////////Withholding///////////////
+    ///////////////Withholding////////////////
     <TextView
         android:id="@+id/withholding"
         android:layout_width="wrap_content"
