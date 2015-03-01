@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.michaelt.paycheckmileagecalculator.fragment.HourlyFragment;
+import com.michaelt.paycheckmileagecalculator.fragment.SalaryFragment;
+
 
 public class MainActivity extends ActionBarActivity {
 

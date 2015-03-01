@@ -24,7 +24,6 @@
         android:text="@string/gross_pay"
         android:layout_toRightOf="@+id/left_indentation_view"
         android:layout_marginBottom="12dp"/>
-        //android:background="#ff00BB00"/>
     <EditText
         android:id="@+id/edit_gross_pay"
         android:layout_width="65dp"
@@ -33,7 +32,6 @@
         android:layout_alignTop="@+id/gross_pay"
         android:gravity="right"
         android:background="#ffa4a4a4"/>
-        //android:text="100000"
 
     ///////////////Paychecks Remaining///////////////
     <TextView
@@ -44,7 +42,6 @@
         android:layout_below="@+id/gross_pay"
         android:layout_alignLeft="@+id/gross_pay"
         android:layout_marginBottom="12dp"/>
-        //android:background="#ff00BBFF"/>
     <EditText
         android:id="@+id/edit_num_paychecks"
         android:layout_width="65dp"
@@ -53,7 +50,6 @@
         android:layout_alignTop="@+id/num_paychecks"
         android:gravity="right"
         android:background="#ffa4a4a4"/>
-        //android:text="3"
 
     ///////////////Filing Status///////////////
     <TextView
@@ -64,14 +60,13 @@
         android:layout_below="@+id/num_paychecks"
         android:layout_alignLeft="@+id/gross_pay"
         android:layout_marginBottom="12dp"/>
-        //android:background="#ff00BB00"/>
     <Spinner
         android:id="@+id/filing_status_spinner"
         android:layout_width="65dp"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/right_indentation_view"
         android:layout_alignTop="@+id/filing_status"
-        android:background="#ff008800"/>
+        android:background="#ffa4a4a4"/>
 
     ///////////////Withholding///////////////
     <TextView
@@ -82,7 +77,6 @@
         android:layout_below="@+id/filing_status"
         android:layout_alignLeft="@+id/gross_pay"
         android:layout_marginBottom="12dp"/>
-        //android:background="#ff00BBFF"/>
     <EditText
         android:id="@+id/edit_withholding"
         android:layout_width="65dp"
@@ -91,7 +85,6 @@
         android:layout_alignTop="@+id/withholding"
         android:gravity="right"
         android:background="#ffa4a4a4"/>
-        //android:text="2"
 
     ///////////////Allowances///////////////
     <TextView
@@ -101,7 +94,6 @@
         android:text="@string/allowances"
         android:layout_below="@+id/withholding"
         android:layout_alignLeft="@+id/gross_pay"/>
-        //android:background="#ff00BB00"/>
     <EditText
         android:id="@+id/edit_allowances"
         android:layout_width="65dp"
@@ -110,6 +102,5 @@
         android:layout_alignTop="@+id/allowances"
         android:gravity="right"
         android:background="#ffa4a4a4"/>
-        //android:text="30"
 
 </RelativeLayout>
