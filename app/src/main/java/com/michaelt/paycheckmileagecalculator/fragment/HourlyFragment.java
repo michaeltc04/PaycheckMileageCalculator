@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.michaelt.paycheckmileagecalculator.R;
 import com.michaelt.paycheckmileagecalculator.adapter.PayFragmentAdapter;
@@ -16,15 +17,17 @@ import com.michaelt.paycheckmileagecalculator.adapter.PayFragmentAdapter;
 public class HourlyFragment extends Fragment {
     private View mView;
     private String[] status;
+    private Context mContext;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mContext = getActivity().getApplicationContext();
         mView = inflater.inflate(R.layout.fragment_hourly, null);
         Spinner spinner = (Spinner) mView.findViewById(R.id.filing_status_spinner);
         status = new String[]{"Single", "Joint", "Married", "Head"};
 
-        PayFragmentAdapter myAdapter = new PayFragmentAdapter(getActivity().getApplicationContext(), status);
+        PayFragmentAdapter myAdapter = new PayFragmentAdapter(mContext, status);
         spinner.setAdapter(myAdapter);
         return mView;
     }

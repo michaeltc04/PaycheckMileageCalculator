@@ -3,7 +3,8 @@
     android:layout_height="wrap_content"
     tools:context="com.michaelt.paycheckmileagecalculator.salaryFragment"
     android:layout_marginTop="20dp"
-    android:layout_marginBottom="20dp">
+    android:layout_marginBottom="20dp"
+    android:paddingBottom="20dp">
 
     ///////////////Indentation Views///////////////
     <View
@@ -32,6 +33,12 @@
         android:layout_alignBaseline="@+id/hourly_rate"
         android:gravity="right"
         android:background="#ffa4a4a4"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/edit_hourly_rate"
+        android:textColor="#00aa00"
+        android:text="$"/>
 
     ///////////////Paychecks Remaining///////////////
     <TextView
