@@ -6,10 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.michaelt.paycheckmileagecalculator.R;
 import com.michaelt.paycheckmileagecalculator.adapter.PayFragmentAdapter;

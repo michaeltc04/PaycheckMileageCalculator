@@ -1,9 +1,13 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/salary_fragment"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context="com.michaelt.paycheckmileagecalculator.salaryFragment"
     android:layout_marginTop="20dp"
-    android:layout_marginBottom="20dp">
+    android:layout_marginBottom="20dp"
+    android:paddingBottom="20dp">
 
     ///////////////Indentation Views///////////////
     <View
@@ -29,9 +33,15 @@
         android:layout_width="65dp"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/right_indentation_view"
-        android:layout_alignTop="@+id/gross_pay"
+        android:layout_alignBaseline="@+id/gross_pay"
         android:gravity="right"
         android:background="#ffa4a4a4"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/edit_gross_pay"
+        android:textColor="#00aa00"
+        android:text="$"/>
 
     ///////////////Paychecks Remaining///////////////
     <TextView
@@ -47,7 +57,7 @@
         android:layout_width="65dp"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/right_indentation_view"
-        android:layout_alignTop="@+id/num_paychecks"
+        android:layout_alignBaseline="@+id/num_paychecks"
         android:gravity="right"
         android:background="#ffa4a4a4"/>
 
@@ -58,7 +68,7 @@
         android:layout_height="wrap_content"
         android:text="@string/filing_status"
         android:layout_below="@+id/num_paychecks"
-        android:layout_alignLeft="@+id/gross_pay"
+        android:layout_alignLeft="@+id/num_paychecks"
         android:layout_marginBottom="12dp"/>
     <Spinner
         android:id="@+id/filing_status_spinner"
@@ -66,6 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/right_indentation_view"
         android:layout_alignTop="@+id/filing_status"
+        android:paddingTop="5dp"
         android:background="#ffa4a4a4"/>
 
     ///////////////Withholding///////////////

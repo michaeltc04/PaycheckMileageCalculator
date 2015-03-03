@@ -8,19 +8,47 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/state_question_view"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="40dp"/>
         <Spinner
             android:id="@+id/state_spinner"
             android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:background="#ffa4a4a4"
+            android:gravity="center"/>
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#ffa4a4a4"/>
-
-        <FrameLayout
-            android:id="@+id/pay_fragment_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </FrameLayout>
+            android:text="@string/pay_question_view"
+            android:layout_marginRight="5dp"
+            android:layout_marginLeft="20dp"/>
+        <Spinner
+            android:id="@+id/pay_type_spinner"
+            android:layout_width="75dp"
+            android:layout_height="20dp"
+            android:background="#ffa4a4a4"
+            android:layout_marginRight="40dp"
+            android:gravity="center"/>
     </LinearLayout>
+
+    <View
+        android:layout_width="234dp"
+        android:layout_height="1dp"
+        android:background="#000000"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="15dp"/>
+
+    <FrameLayout
+        android:id="@+id/pay_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </FrameLayout>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -31,11 +59,12 @@
 
         <View
             android:id="@+id/top_line"
-            android:layout_width="match_parent"
+            android:layout_width="240dp"
             android:layout_height="1dp"
             android:background="#000000"
             android:layout_margin="15dp"
-            android:layout_alignParentTop="true"/>
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
 
         <TextView
             android:id="@+id/federal_tax"
@@ -53,7 +82,7 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/top_line"
             android:layout_margin="10dp"
-            android:text="TESTTEXT"/>
+            android:textColor="#000"/>
 
         <TextView
             android:id="@+id/medicare_tax"
@@ -71,7 +100,7 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/federal_tax_value"
             android:layout_margin="10dp"
-            android:text="TESTTEXT" />
+            android:textColor="#000"/>
 
         <TextView
             android:id="@+id/social_security_tax"
@@ -89,22 +118,27 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/medicare_tax_value"
             android:layout_margin="10dp"
-            android:text="TESTTEXT" />
+            android:textColor="#000"/>
 
         <View
             android:id="@+id/bottom_line"
-            android:layout_width="match_parent"
+            android:layout_width="240dp"
             android:layout_height="1dp"
             android:layout_margin="20dp"
             android:background="#000000"
+            android:layout_centerHorizontal="true"
             android:layout_below="@+id/social_security_tax_value"/>
 
         <Button
+            android:id="@+id/calculate_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/bottom_line"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:gravity="center"
+            android:layout_alignParentBottom="true"
+            android:text="@string/calculate_button"/>
 
     </RelativeLayout>
 
 </LinearLayout>
+

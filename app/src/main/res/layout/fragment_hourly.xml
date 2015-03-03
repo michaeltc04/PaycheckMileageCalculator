@@ -1,5 +1,8 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/hourly_fragment"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context="com.michaelt.paycheckmileagecalculator.salaryFragment"
     android:layout_marginTop="20dp"
@@ -22,7 +25,7 @@
         android:id="@+id/hourly_rate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/gross_pay"
+        android:text="@string/hourly_rate"
         android:layout_toRightOf="@+id/left_indentation_view"
         android:layout_marginBottom="12dp"/>
     <EditText
@@ -45,7 +48,7 @@
         android:id="@+id/hours_worked"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/num_paychecks"
+        android:text="@string/hours_worked"
         android:layout_below="@+id/hourly_rate"
         android:layout_alignLeft="@+id/hourly_rate"
         android:layout_marginBottom="12dp"/>

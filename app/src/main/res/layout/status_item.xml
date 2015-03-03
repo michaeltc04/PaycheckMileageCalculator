@@ -3,7 +3,7 @@
     android:id="@+id/filing_status_item"
     android:background="#ffa4a4a4"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="30dp"
     android:gravity="center"
     android:textColor="#ffffff">
 

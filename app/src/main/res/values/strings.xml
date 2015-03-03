@@ -14,4 +14,10 @@
     <string name="social_security">Social Security Tax</string>
     <string name="medicare">Medicare Tax</string>
     <string name="federal">Federal Tax</string>
+    <string name="title_activity_paycheck_input_fragment">PaycheckInputFragment</string>
+    <string name="state_question_view">State:</string>
+    <string name="calculate_button">Calculate</string>
+    <string name="pay_question_view">Pay Type:</string>
+    <string name="hourly">Hourly</string>
+    <string name="salary">Salary</string>
 </resources>
