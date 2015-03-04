@@ -1,5 +1,6 @@
 package com.michaelt.paycheckmileagecalculator.fragment;
 
+import android.app.AlertDialog;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -11,11 +12,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.michaelt.paycheckmileagecalculator.R;
 import com.michaelt.paycheckmileagecalculator.adapter.PayFragmentAdapter;
+
+import org.w3c.dom.Text;
+
+import java.text.DecimalFormat;
 
 public class PaycheckInputFragment extends Fragment {
     private View mView;
@@ -27,8 +33,12 @@ public class PaycheckInputFragment extends Fragment {
     private SalaryFragment mSalaryFragment;
     private Button mButton;
     private TextView mFedTaxView, mMedTaxView, mSSTaxView, mStateTaxView;
+    private EditText hourly_rate, hours_worked, gross_pay, num_paychecks;
     private ArrayMap<String, Double> mFlatStateTaxes;
-    ArrayMap<String, double[]> mStateTaxes;
+    private ArrayMap<String, double[]> mStateTaxes;
+    private ArrayMap<String, Integer> mStandardDeduction;
+    double[] mSingleFederalTaxBracket, mJointFederalTaxBracket, mMarriedFederalTaxBracket,
+             mTaxBracketRates, mHeadFederalTaxBracket;
     private double mIncomeTax;
     private boolean isFirst = true;
 
@@ -98,30 +108,29 @@ public class PaycheckInputFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
+                DecimalFormat df = new DecimalFormat("#.00");
                 //States without income tax
                 if (mSelectedState.equals("Alaska") |
-                    mSelectedState.equals("Florida") |
-                    mSelectedState.equals("Nevada") |
-                    mSelectedState.equals("South Dakota") |
-                    mSelectedState.equals("Texas") |
-                    mSelectedState.equals("Washington") |
-                    mSelectedState.equals("Wyoming") |
-                    mSelectedState.equals("New Hampshire") |
-                    mSelectedState.equals("Tennessee")) {
-                            mIncomeTax = 0;
+                        mSelectedState.equals("Florida") |
+                        mSelectedState.equals("Nevada") |
+                        mSelectedState.equals("South Dakota") |
+                        mSelectedState.equals("Texas") |
+                        mSelectedState.equals("Washington") |
+                        mSelectedState.equals("Wyoming") |
+                        mSelectedState.equals("New Hampshire") |
+                        mSelectedState.equals("Tennessee")) {
+                    mIncomeTax = 0;
+                    //mStateTaxView.setText(Double.valueOf(df.format(mIncomeTax)) + "%");
                 } else {
                     if(mFlatStateTaxes.get(mSelectedState) != null) {
                         mIncomeTax = mFlatStateTaxes.get(mSelectedState);
-                        mStateTaxView.setText("" + mIncomeTax);
+                        //mStateTaxView.setText(Double.valueOf(df.format(mIncomeTax)) + "%");
+                        calculateStateIncomeTax(true);
                     } else {
-
+                        double[] state_values = mStateTaxes.get(mSelectedState);
+                        //mStateTaxView.setText(Double.valueOf(df.format(state_values[3])) + " to " + Double.valueOf(df.format(state_values[4])) + "%");
+                        calculateStateIncomeTax(false);
                     }
-                }
-                if (mSelectedState.equals("Alabama") | mSelectedState.equals("Washington") | mSelectedState.equals("Hawaii") |
-                mSelectedState.equals("California") | mSelectedState.equals("Mississippi") | mSelectedState.equals("Ohio")) {
-                    mFedTaxView.setText("8%");
-                } else {
-                    mFedTaxView.setText("4%");
                 }
             }
         });
@@ -145,14 +154,14 @@ public class PaycheckInputFragment extends Fragment {
         mPaySpinner.setAdapter(myPayAdapter);
 
         //Tax Bracket Due Data
-        double[] mSingleFederalTaxBracket = new double[]{922.5,5156.25,18481.25,46075.25,119401.25,119996.25};
-        double[] mJointFederalTaxBracket = new double[]{1845,10312.5,29387.5,51577.5,111324,129996.5};
-        double[] mMarriedFederalTaxBracket = new double[]{922.5,5156.25,14693.75,25788.75,55662,64998.25};
-        double[] mHeadFederalTaxBracket = new double[]{1315,6872.5,26775.5,49192.5,115737,125362};
-        double[] mTaxBracketRates = new double[] {.1, .15, .25, .28, .33, .35, .396};
+        mSingleFederalTaxBracket = new double[]{922.5,5156.25,18481.25,46075.25,119401.25,119996.25};
+        mJointFederalTaxBracket = new double[]{1845,10312.5,29387.5,51577.5,111324,129996.5};
+        mMarriedFederalTaxBracket = new double[]{922.5,5156.25,14693.75,25788.75,55662,64998.25};
+        mHeadFederalTaxBracket = new double[]{1315,6872.5,26775.5,49192.5,115737,125362};
+        mTaxBracketRates = new double[] {.1, .15, .25, .28, .33, .35, .396};
 
         //Standard Deduction Data
-        ArrayMap<String, Integer> mStandardDeduction = new ArrayMap<String, Integer>();
+        mStandardDeduction = new ArrayMap<String, Integer>();
         mStandardDeduction.put("Single", 6300);
         mStandardDeduction.put("Married", 6300);
         mStandardDeduction.put("Joint", 12600);
@@ -256,6 +265,114 @@ public class PaycheckInputFragment extends Fragment {
         mStateTaxes.put("Washington D.C.", dc);
     }
 
+    private void calculateStateIncomeTax(boolean isFlat) {
+        double rate = 0, hours = 0, gross = 0, paychecks = 0;
+        boolean input = false;
+        boolean hrorsal;
 
+        if(mFragTag.equals("Hourly"))hrorsal = true;
+        else hrorsal = false;
 
+        try {
+            if (mFragTag.equals(getResources().getString(R.string.hourly))) {
+                hourly_rate = (EditText) mView.findViewById(R.id.edit_hourly_rate);
+                hours_worked = (EditText) mView.findViewById(R.id.edit_hours_worked);
+                hourly_rate.setText("10");
+                hours_worked.setText("80");
+                rate = Double.parseDouble(hourly_rate.getText().toString());
+                hours = Double.parseDouble(hours_worked.getText().toString());
+            } else {
+                gross_pay = (EditText) mView.findViewById(R.id.edit_gross_pay);
+                num_paychecks = (EditText) mView.findViewById(R.id.edit_num_paychecks);
+                gross = Double.parseDouble(gross_pay.getText().toString());
+                paychecks = Double.parseDouble(num_paychecks.getText().toString());
+            }
+            input = true;
+        } catch (NumberFormatException e) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("All your values need to be numbers!").setTitle("Improper Input");
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+
+        //gross - standard deduction - personal exemption
+        /*
+        double[0] = F
+        double[1] = G
+        double[2] = J
+        double[3] = B
+        double[4] = D
+
+        incomeBracketSteps = (J-G)/(F-2)
+        taxRateSteps = (D-B)/(F-2)
+        numSteps = (F-2)
+         */
+        double total = 0;
+        double state_tax = 0;
+
+        if(isFlat && input) {
+            state_tax = mFlatStateTaxes.get(mSelectedState) / 100;
+            total = (rate * hours * state_tax);
+            System.out.println(rate + " " + hours + " " + state_tax + " " + total);
+        } else if (input) {
+            double[] state_info = mStateTaxes.get(mSelectedState);
+            //The dollar range of each tax bracket (estimated)
+            double incomeBracketSteps = (state_info[2] - state_info[1])/(state_info[0] - 2);
+            //The tax rate increase per tax bracket (estimated)
+            double taxRateSteps = ((state_info[4] - state_info[3]) / (state_info[0] - 1)) / 100;
+            //The max number of steps to get through to each bracket for calculation purposes
+            double maxSteps = state_info[0] - 2;
+            //The lowest starting tax bracket dollar cap
+            double stateBracket = state_info[1];
+            //The lowest starting tax bracket tax rate
+            double stateTax = state_info[3] / 100;
+            //Dummy variable to hold income
+            double d = 0;
+            //For calculation purposes, works with maxSteps
+            int count = 0;
+            //Initialize gross amount of money this person can make
+            if (hrorsal) d = (rate * hours * R.integer.pay_periods);
+            else d = gross;
+
+            //Subtract lowest tax bracket cap amount
+            d = d - state_info[1];
+
+            //Get a proper count to ensure how many calculations need to be done
+            while( d > 0 && maxSteps > 0) {
+                maxSteps--;
+                count++;
+                d = d - incomeBracketSteps;
+            }
+
+            //Reaffirm dummy variable for gross income
+            if (hrorsal) d = (rate * hours * R.integer.pay_periods);
+            else d = gross;
+
+            //Calculate State Income Tax
+            if (count == 0) {
+                total = (d * stateTax) / R.integer.pay_periods;
+            } else {
+                d = d - stateBracket;
+                total = stateBracket * stateTax;
+                while (count > 0) {
+                    count--;
+                    stateTax = stateTax + taxRateSteps;
+                    d = d - incomeBracketSteps;
+                    total = total + (incomeBracketSteps * stateTax);
+                }
+                stateTax = stateTax + taxRateSteps;
+                total = total + (d * stateTax);
+                total = total / R.integer.pay_periods;
+            }
+
+        }
+
+        //Display State Income Tax, formatted to 2 decimals
+        //FORMATTING NEEDS TO GET FIXED HERE
+        //FORMATTING NEEDS TO GET FIXED HERE
+        //FORMATTING NEEDS TO GET FIXED HERE
+        //FORMATTING NEEDS TO GET FIXED HERE
+        DecimalFormat df = new DecimalFormat("#.00");
+        mStateTaxView.setText("$" + Double.valueOf(df.format(total)));
+    }
 }
