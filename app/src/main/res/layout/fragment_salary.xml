@@ -78,40 +78,4 @@
         android:layout_alignTop="@+id/filing_status"
         android:paddingTop="5dp"
         android:background="#ffa4a4a4"/>
-
-    ///////////////Withholding///////////////
-    <TextView
-        android:id="@+id/withholding"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/withholding"
-        android:layout_below="@+id/filing_status"
-        android:layout_alignLeft="@+id/gross_pay"
-        android:layout_marginBottom="12dp"/>
-    <EditText
-        android:id="@+id/edit_withholding"
-        android:layout_width="65dp"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/right_indentation_view"
-        android:layout_alignTop="@+id/withholding"
-        android:gravity="right"
-        android:background="#ffa4a4a4"/>
-
-    ///////////////Allowances///////////////
-    <TextView
-        android:id="@+id/allowances"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/allowances"
-        android:layout_below="@+id/withholding"
-        android:layout_alignLeft="@+id/gross_pay"/>
-    <EditText
-        android:id="@+id/edit_allowances"
-        android:layout_width="65dp"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/right_indentation_view"
-        android:layout_alignTop="@+id/allowances"
-        android:gravity="right"
-        android:background="#ffa4a4a4"/>
-
 </RelativeLayout>
