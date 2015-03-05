@@ -26,4 +26,10 @@ public class MainActivity extends FragmentActivity implements PayFragmentCoordin
 
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("Destroyed Destroyed Destroyed Destroyed");
+    }
 }

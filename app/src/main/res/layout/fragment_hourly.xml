@@ -6,10 +6,9 @@
     android:layout_height="wrap_content"
     tools:context="com.michaelt.paycheckmileagecalculator.salaryFragment"
     android:layout_marginTop="20dp"
-    android:layout_marginBottom="20dp"
-    android:paddingBottom="20dp">
+    android:layout_marginBottom="20dp">
 
-    ///////////////Indentation Views///////////////
+<!--    ///////////////Indentation Views///////////////
     <View
         android:id="@+id/left_indentation_view"
         android:layout_width="50dp"
@@ -18,7 +17,7 @@
         android:id="@+id/right_indentation_view"
         android:layout_width="70dp"
         android:layout_height="0dp"
-        android:layout_alignParentRight="true"/>
+        android:layout_alignParentRight="true"/>-->
 
     ///////////////Gross Pay///////////////
     <TextView
@@ -26,22 +25,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hourly_rate"
-        android:layout_toRightOf="@+id/left_indentation_view"
-        android:layout_marginBottom="12dp"/>
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/paycheck_text_size"
+        android:layout_margin="@dimen/paycheck_text_margin"/>
     <EditText
         android:id="@+id/edit_hourly_rate"
         android:layout_width="65dp"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignParentRight="true"
         android:layout_alignBaseline="@+id/hourly_rate"
         android:gravity="right"
-        android:background="#ffa4a4a4"/>
+        android:background="@color/text_background_color"
+        android:paddingRight="5dp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/edit_hourly_rate"
+        android:layout_alignBaseline="@+id/hourly_rate"
         android:textColor="#00aa00"
-        android:text="$"/>
+        android:text="$"
+        android:textSize="@dimen/paycheck_text_size"/>
 
     ///////////////Paychecks Remaining///////////////
     <TextView
@@ -50,16 +53,18 @@
         android:layout_height="wrap_content"
         android:text="@string/hours_worked"
         android:layout_below="@+id/hourly_rate"
-        android:layout_alignLeft="@+id/hourly_rate"
-        android:layout_marginBottom="12dp"/>
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/paycheck_text_size"
+        android:layout_margin="@dimen/paycheck_text_margin"/>
     <EditText
         android:id="@+id/edit_hours_worked"
         android:layout_width="65dp"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignParentRight="true"
         android:layout_alignBaseline="@+id/hours_worked"
         android:gravity="right"
-        android:background="#ffa4a4a4"/>
+        android:background="@color/text_background_color"
+        android:paddingRight="5dp"/>
 
     ///////////////Filing Status///////////////
     <TextView
@@ -68,15 +73,16 @@
         android:layout_height="wrap_content"
         android:text="@string/filing_status"
         android:layout_below="@+id/hours_worked"
-        android:layout_alignLeft="@+id/hours_worked"
-        android:layout_marginBottom="12dp"/>
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/paycheck_text_size"
+        android:layout_margin="@dimen/paycheck_text_margin"/>
     <Spinner
         android:id="@+id/filing_status_spinner"
         android:layout_width="65dp"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/filing_status"
         android:paddingTop="5dp"
-        android:background="#ffa4a4a4"/>
+        android:background="@color/text_background_color"/>
 
 </RelativeLayout>

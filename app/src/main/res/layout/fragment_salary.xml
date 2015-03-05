@@ -1,24 +1,23 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/salary_fragment"
-    android:layout_width="match_parent"
+    android:id="@+id/hourly_fragment"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     tools:context="com.michaelt.paycheckmileagecalculator.salaryFragment"
     android:layout_marginTop="20dp"
-    android:layout_marginBottom="20dp"
-    android:paddingBottom="20dp">
+    android:layout_marginBottom="20dp">
 
-    ///////////////Indentation Views///////////////
-    <View
-        android:id="@+id/left_indentation_view"
-        android:layout_width="50dp"
-        android:layout_height="0dp"/>
-    <View
-        android:id="@+id/right_indentation_view"
-        android:layout_width="70dp"
-        android:layout_height="0dp"
-        android:layout_alignParentRight="true"/>
+    <!--    ///////////////Indentation Views///////////////
+        <View
+            android:id="@+id/left_indentation_view"
+            android:layout_width="50dp"
+            android:layout_height="0dp"/>
+        <View
+            android:id="@+id/right_indentation_view"
+            android:layout_width="70dp"
+            android:layout_height="0dp"
+            android:layout_alignParentRight="true"/>-->
 
     ///////////////Gross Pay///////////////
     <TextView
@@ -26,40 +25,46 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/gross_pay"
-        android:layout_toRightOf="@+id/left_indentation_view"
-        android:layout_marginBottom="12dp"/>
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/paycheck_text_size"
+        android:layout_margin="@dimen/paycheck_text_margin"/>
     <EditText
         android:id="@+id/edit_gross_pay"
         android:layout_width="65dp"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignParentRight="true"
         android:layout_alignBaseline="@+id/gross_pay"
         android:gravity="right"
-        android:background="#ffa4a4a4"/>
+        android:background="@color/text_background_color"
+        android:paddingRight="5dp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/edit_gross_pay"
+        android:layout_alignBaseline="@+id/gross_pay"
         android:textColor="#00aa00"
-        android:text="$"/>
+        android:text="$"
+        android:textSize="@dimen/paycheck_text_size"/>
 
-    ///////////////Paychecks Remaining///////////////
+<!--    ///////////////Paychecks Remaining///////////////
     <TextView
         android:id="@+id/num_paychecks"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/num_paychecks"
         android:layout_below="@+id/gross_pay"
-        android:layout_alignLeft="@+id/gross_pay"
-        android:layout_marginBottom="12dp"/>
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/paycheck_text_size"
+        android:layout_margin="@dimen/paycheck_text_margin"/>
     <EditText
         android:id="@+id/edit_num_paychecks"
         android:layout_width="65dp"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignParentRight="true"
         android:layout_alignBaseline="@+id/num_paychecks"
         android:gravity="right"
-        android:background="#ffa4a4a4"/>
+        android:background="@color/text_background_color"
+        android:paddingRight="5dp"/>-->
 
     ///////////////Filing Status///////////////
     <TextView
@@ -67,15 +72,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/filing_status"
-        android:layout_below="@+id/num_paychecks"
-        android:layout_alignLeft="@+id/num_paychecks"
-        android:layout_marginBottom="12dp"/>
+        android:layout_below="@+id/gross_pay"
+        android:layout_alignParentLeft="true"
+        android:textSize="@dimen/paycheck_text_size"
+        android:layout_margin="@dimen/paycheck_text_margin"/>
     <Spinner
         android:id="@+id/filing_status_spinner"
         android:layout_width="65dp"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/right_indentation_view"
+        android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/filing_status"
         android:paddingTop="5dp"
-        android:background="#ffa4a4a4"/>
+        android:background="@color/text_background_color"/>
+
 </RelativeLayout>

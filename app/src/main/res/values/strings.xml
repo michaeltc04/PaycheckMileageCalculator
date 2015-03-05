@@ -6,7 +6,7 @@
 
     <string name="allowances">Allowances</string>
     <string name="gross_pay">Gross Yearly Pay</string>
-    <string name="num_paychecks"># of Paychecks (YTD)</string>
+    <string name="num_paychecks">YTD Pay Periods</string>
     <string name="withholding">Withholding</string>
     <string name="filing_status">Filing Status</string>
     <string name="hourly_rate">Hourly Pay Rate</string>
@@ -20,4 +20,6 @@
     <string name="pay_question_view">Pay Type:</string>
     <string name="hourly">Hourly</string>
     <string name="salary">Salary</string>
+    <string name="state_income_tax">State Income Tax</string>
+    <string name="estimated_pay">Estimated Pay:</string>
 </resources>

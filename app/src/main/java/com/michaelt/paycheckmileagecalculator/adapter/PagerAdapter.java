@@ -41,7 +41,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position) {
             case 0:
-                return "Paycheck Calculator";
+                return "Paycheck Estimator";
             case 1:
                 return "MPG Calculator";
             default:

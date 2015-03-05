@@ -15,13 +15,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import com.michaelt.paycheckmileagecalculator.R;
 import com.michaelt.paycheckmileagecalculator.adapter.PayFragmentAdapter;
-
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
+import android.content.SharedPreferences;
 
 public class PaycheckInputFragment extends Fragment {
     private View mView;
@@ -33,13 +32,14 @@ public class PaycheckInputFragment extends Fragment {
     private SalaryFragment mSalaryFragment;
     private Button mButton;
     private TextView mFedTaxView, mMedTaxView, mSSTaxView, mStateTaxView;
-    private EditText hourly_rate, hours_worked, gross_pay, num_paychecks;
+    private EditText hourlyRate, hoursWorked, grossPay, num_paychecks;
     private ArrayMap<String, Double> mFlatStateTaxes;
     private ArrayMap<String, double[]> mStateTaxes;
     private ArrayMap<String, Integer> mStandardDeduction;
     double[] mSingleFederalTaxBracket, mJointFederalTaxBracket, mMarriedFederalTaxBracket,
              mTaxBracketRates, mHeadFederalTaxBracket;
-    private double mIncomeTax;
+    private double mIncomeTax, savedGrossValue, savedRateValue, savedHoursValue;
+
     private boolean isFirst = true;
 
     @Override
@@ -47,6 +47,7 @@ public class PaycheckInputFragment extends Fragment {
         mContext = getActivity().getApplicationContext();
         mView = inflater.inflate(R.layout.paycheck_input_fragment, null);
         createData();
+
         mHourlyFragment = new HourlyFragment();
         mSalaryFragment = new SalaryFragment();
         mButton = (Button) mView.findViewById(R.id.calculate_button);
@@ -55,18 +56,23 @@ public class PaycheckInputFragment extends Fragment {
         mSSTaxView = (TextView) mView.findViewById(R.id.social_security_tax_value);
         mStateTaxView = (TextView) mView.findViewById(R.id.state_income_tax_value);
 
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-
         mFragTag = "Salary";
-        ft.add(R.id.pay_fragment_container, mSalaryFragment);
-        ft.commit();
-
         createListeners();
+
         return mView;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * Creates all the itemSelected and click listeners for spinners and buttons
+     */
     private void createListeners() {
+
+        //onItemSelected Listener for state selection spinner
         mStateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -75,19 +81,19 @@ public class PaycheckInputFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                //do nothing
             }
         });
+
+        //onItemSelected Listener for Pay type selection spinner
         mPaySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (isFirst) {
-                    isFirst = false;
-                    return;
-                }
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
                 String tester = mFragTag.toString();
+
+
                 if (tester.equalsIgnoreCase("Hourly")) {
                     mFragTag = "Salary";
                     ft.replace(R.id.pay_fragment_container, mSalaryFragment);
@@ -100,15 +106,15 @@ public class PaycheckInputFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                //do nothing
             }
         });
 
+        //onClick Listener for Calculate button
         mButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                DecimalFormat df = new DecimalFormat("#.00");
                 //States without income tax
                 if (mSelectedState.equals("Alaska") |
                         mSelectedState.equals("Florida") |
@@ -120,22 +126,23 @@ public class PaycheckInputFragment extends Fragment {
                         mSelectedState.equals("New Hampshire") |
                         mSelectedState.equals("Tennessee")) {
                     mIncomeTax = 0;
-                    //mStateTaxView.setText(Double.valueOf(df.format(mIncomeTax)) + "%");
+                    displayCurrencyValue(mStateTaxView, mIncomeTax);
                 } else {
                     if(mFlatStateTaxes.get(mSelectedState) != null) {
-                        mIncomeTax = mFlatStateTaxes.get(mSelectedState);
-                        //mStateTaxView.setText(Double.valueOf(df.format(mIncomeTax)) + "%");
+                        //States with flat tax rates
                         calculateStateIncomeTax(true);
                     } else {
-                        double[] state_values = mStateTaxes.get(mSelectedState);
-                        //mStateTaxView.setText(Double.valueOf(df.format(state_values[3])) + " to " + Double.valueOf(df.format(state_values[4])) + "%");
+                        //States with varying tax rates
                         calculateStateIncomeTax(false);
                     }
                 }
-            }
+             }
         });
     }
 
+    /**
+     * Populates proper variables with needed basic data for calculating tax information / state information.
+     */
     public void createData() {
         mStateSpinner = (Spinner) mView.findViewById(R.id.state_spinner);
         mStates = new String[] {"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
@@ -149,24 +156,34 @@ public class PaycheckInputFragment extends Fragment {
         mStateSpinner.setAdapter(myAdapter);
 
         mPaySpinner = (Spinner) mView.findViewById(R.id.pay_type_spinner);
-        mPayTypes = new String[] {"Salary", "Hourly"};
+        mPayTypes = new String[] {"Hourly", "Salary"};
         PayFragmentAdapter myPayAdapter = new PayFragmentAdapter(mContext, mPayTypes);
         mPaySpinner.setAdapter(myPayAdapter);
 
-        //Tax Bracket Due Data
+        //Federal Tax Bracket Due Data
         mSingleFederalTaxBracket = new double[]{922.5,5156.25,18481.25,46075.25,119401.25,119996.25};
         mJointFederalTaxBracket = new double[]{1845,10312.5,29387.5,51577.5,111324,129996.5};
         mMarriedFederalTaxBracket = new double[]{922.5,5156.25,14693.75,25788.75,55662,64998.25};
         mHeadFederalTaxBracket = new double[]{1315,6872.5,26775.5,49192.5,115737,125362};
         mTaxBracketRates = new double[] {.1, .15, .25, .28, .33, .35, .396};
 
-        //Standard Deduction Data
+        //Federal Standard Deduction Data
         mStandardDeduction = new ArrayMap<String, Integer>();
         mStandardDeduction.put("Single", 6300);
         mStandardDeduction.put("Married", 6300);
         mStandardDeduction.put("Joint", 12600);
         mStandardDeduction.put("Head", 9250);
 
+        //Populates data with proper information
+        doStateIncomeTax();
+    }
+
+    /**
+     *  Populates mFlatStateTaxes with flat tax rate information for qualifying states and
+     *  populates mStateTaxes with varying Tax Rate information for calculations for each state
+     */
+
+    private void doStateIncomeTax() {
         //Flat Income Tax Rates
         mFlatStateTaxes = new ArrayMap<String, Double>();
         mFlatStateTaxes.put("Colorado", 4.63);
@@ -178,23 +195,12 @@ public class PaycheckInputFragment extends Fragment {
         mFlatStateTaxes.put("Pennsylvania", 3.07);
         mFlatStateTaxes.put("Utah", 5.0);
 
-        doStateIncomeTax();
-    }
-
-    private void doStateIncomeTax() {
-        mStateTaxes = new ArrayMap<String, double[]>();
-
         /*
-        double[0] = F
-        double[1] = G
-        double[2] = J
-        double[3] = B
-        double[4] = D
-
-        incomeBracketSteps = (J-G)/(F-1)
-        taxRateSteps = (D-B)/(F-1)
-        numSteps = (F-1)
-         */
+            Varying Income Tax Rate information
+            Each array cell corresponds to a specific value. See
+            calculateStateIncomeTaxValue comments for more information
+        */
+        mStateTaxes = new ArrayMap<String, double[]>();
         double[] alabama = new double[]     {3, 500, 3001, 2, 5};
         mStateTaxes.put("Alabama", alabama);
         double[] arizona = new double[]     {5, 10000, 150001, 2.59, 4.54};
@@ -265,6 +271,11 @@ public class PaycheckInputFragment extends Fragment {
         mStateTaxes.put("Washington D.C.", dc);
     }
 
+    /**
+     * Calculates and displays State Income Tax for selected state
+     *
+     * @param isFlat if true, a flat tax rate state is called. Changes calculation method if false.
+     */
     private void calculateStateIncomeTax(boolean isFlat) {
         double rate = 0, hours = 0, gross = 0, paychecks = 0;
         boolean input = false;
@@ -273,18 +284,17 @@ public class PaycheckInputFragment extends Fragment {
         if(mFragTag.equals("Hourly"))hrorsal = true;
         else hrorsal = false;
 
+        //Catches possible improper input by the user (NumberFormatException)
         try {
             if (mFragTag.equals(getResources().getString(R.string.hourly))) {
-                hourly_rate = (EditText) mView.findViewById(R.id.edit_hourly_rate);
-                hours_worked = (EditText) mView.findViewById(R.id.edit_hours_worked);
-                hourly_rate.setText("10");
-                hours_worked.setText("80");
-                rate = Double.parseDouble(hourly_rate.getText().toString());
-                hours = Double.parseDouble(hours_worked.getText().toString());
+                hourlyRate = (EditText) mView.findViewById(R.id.edit_hourly_rate);
+                hoursWorked = (EditText) mView.findViewById(R.id.edit_hours_worked);
+                rate = Double.parseDouble(hourlyRate.getText().toString());
+                hours = Double.parseDouble(hoursWorked.getText().toString());
             } else {
-                gross_pay = (EditText) mView.findViewById(R.id.edit_gross_pay);
-                num_paychecks = (EditText) mView.findViewById(R.id.edit_num_paychecks);
-                gross = Double.parseDouble(gross_pay.getText().toString());
+                grossPay = (EditText) mView.findViewById(R.id.edit_gross_pay);
+                //num_paychecks = (EditText) mView.findViewById(R.id.edit_num_paychecks);
+                gross = Double.parseDouble(grossPay.getText().toString());
                 paychecks = Double.parseDouble(num_paychecks.getText().toString());
             }
             input = true;
@@ -295,21 +305,25 @@ public class PaycheckInputFragment extends Fragment {
             dialog.show();
         }
 
-        //gross - standard deduction - personal exemption
         /*
-        double[0] = F
-        double[1] = G
-        double[2] = J
-        double[3] = B
-        double[4] = D
+        gross - standard deduction - personal exemption
 
-        incomeBracketSteps = (J-G)/(F-2)
-        taxRateSteps = (D-B)/(F-2)
-        numSteps = (F-2)
+        All variables unique for each state
+
+        double[0] = A - Number of Tax Brackets
+        double[1] = B - Lowest Tax Bracket value
+        double[2] = C - Highest Tax Bracket value
+        double[3] = D - Lowest Tax Rate
+        double[4] = E - Highest Tax Rate
+
+        incomeBracketSteps = (C-B)/(A-2)
+        taxRateSteps = (E-D)/(A-1)
+        numSteps = (A-2)
          */
         double total = 0;
         double state_tax = 0;
 
+        //Calculates State Income Tax at Flat Rate OR Adjusting Rate (depending on state)
         if(isFlat && input) {
             state_tax = mFlatStateTaxes.get(mSelectedState) / 100;
             total = (rate * hours * state_tax);
@@ -362,17 +376,23 @@ public class PaycheckInputFragment extends Fragment {
                 }
                 stateTax = stateTax + taxRateSteps;
                 total = total + (d * stateTax);
-                total = total / R.integer.pay_periods;
+                total = total / getResources().getInteger(R.integer.pay_periods);
             }
 
         }
+        //Display State Income Tax, formatted for US currency
+        mIncomeTax = total + 0;
+        displayCurrencyValue(mStateTaxView, mIncomeTax);
+    }
 
-        //Display State Income Tax, formatted to 2 decimals
-        //FORMATTING NEEDS TO GET FIXED HERE
-        //FORMATTING NEEDS TO GET FIXED HERE
-        //FORMATTING NEEDS TO GET FIXED HERE
-        //FORMATTING NEEDS TO GET FIXED HERE
-        DecimalFormat df = new DecimalFormat("#.00");
-        mStateTaxView.setText("$" + Double.valueOf(df.format(total)));
+    /**
+     * Displays a currency value (double) in a TextView container
+     *
+     * @param container The TextView container to display the text
+     * @param value The value, displayed in US currency
+     */
+    private void displayCurrencyValue(TextView container, double value) {
+        NumberFormat nf = DecimalFormat.getCurrencyInstance(Locale.US);
+        container.setText(nf.format(value));
     }
 }

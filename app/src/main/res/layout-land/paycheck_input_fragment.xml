@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:paddingLeft="80dp"
+        android:paddingRight="80dp">
+        <TextView
+            android:id="@+id/state_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/state_question_view"
+            android:layout_alignParentLeft="true"
+            android:textSize="18dp"/>
+        <Spinner
+            android:id="@+id/state_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/paycheck_spinner_height"
+            android:background="@color/text_background_color"
+            android:gravity="center"
+            android:layout_toRightOf="@+id/state_text_view"
+            android:layout_toLeftOf="@+id/pay_type_text_view"
+            android:layout_alignBaseline="@+id/state_text_view"/>
+        <TextView
+            android:id="@+id/pay_type_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pay_question_view"
+            android:layout_toLeftOf="@+id/pay_type_spinner"
+            android:layout_marginLeft="10dp"
+            android:textSize="18dp"/>
+        <Spinner
+            android:id="@+id/pay_type_spinner"
+            android:layout_width="75dp"
+            android:layout_height="@dimen/paycheck_spinner_height"
+            android:background="@color/text_background_color"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:layout_alignBaseline="@+id/pay_type_text_view"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="240dp"
+        android:layout_height="1dp"
+        android:background="#000000"
+        android:layout_gravity="center_horizontal"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+    <FrameLayout
+        android:id="@+id/pay_fragment_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_weight="7">
+    </FrameLayout>
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/paycheck_left_indentation"
+        android:paddingRight="@dimen/paycheck_right_indentation"
+        android:layout_weight="5">
+        <!--
+            <View
+                android:id="@+id/top_line"
+                android:layout_width="240dp"
+                android:layout_height="1dp"
+                android:background="#000000"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"/>-->
+
+            <TextView
+                android:id="@+id/federal_tax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_margin="@dimen/paycheck_text_margin"
+                android:text="@string/federal"
+                android:textSize="@dimen/paycheck_text_size"/>
+
+            <TextView
+                android:id="@+id/federal_tax_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignBaseline="@+id/federal_tax"
+                android:textSize="@dimen/paycheck_text_size"
+                android:textColor="#000"/>
+
+            <TextView
+                android:id="@+id/medicare_tax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/medicare"
+                android:layout_alignParentLeft="true"
+                android:layout_margin="@dimen/paycheck_text_margin"
+                android:layout_below="@+id/federal_tax"
+                android:textSize="@dimen/paycheck_text_size"/>
+
+            <TextView
+                android:id="@+id/medicare_tax_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignBaseline="@+id/medicare_tax"
+                android:textSize="@dimen/paycheck_text_size"
+                android:textColor="#000"/>
+
+            <TextView
+                android:id="@+id/social_security_tax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/social_security"
+                android:layout_alignParentLeft="true"
+                android:layout_margin="@dimen/paycheck_text_margin"
+                android:layout_below="@+id/medicare_tax"
+                android:textSize="@dimen/paycheck_text_size"/>
+
+            <TextView
+                android:id="@+id/social_security_tax_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignBaseline="@+id/social_security_tax"
+                android:textSize="@dimen/paycheck_text_size"
+                android:textColor="#000"/>
+
+            <TextView
+                android:id="@+id/state_income_tax"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/state_income_tax"
+                android:layout_alignParentLeft="true"
+                android:layout_margin="@dimen/paycheck_text_margin"
+                android:layout_below="@+id/social_security_tax"
+                android:textSize="@dimen/paycheck_text_size"/>
+
+            <TextView
+                android:id="@+id/state_income_tax_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignBaseline="@+id/state_income_tax"
+                android:textSize="@dimen/paycheck_text_size"
+                android:textColor="#000"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/bottom_line"
+        android:layout_width="240dp"
+        android:layout_height="1dp"
+        android:background="#000000"
+        android:layout_gravity="center_horizontal"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="5dp"
+            android:layout_weight="1">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/estimated_pay"
+                android:textColor="@color/green"
+                android:textSize="@dimen/paycheck_text_size"/>
+            <TextView
+                android:id="@+id/paycheck_amount_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text=" 1234567890"
+                android:textColor="@color/red"
+                android:textSize="@dimen/paycheck_text_size"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/calculate_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:gravity="center"
+            android:text="@string/calculate_button"/>
+    </LinearLayout>
+</LinearLayout>
+
