@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -20,6 +21,7 @@ public class HourlyFragment extends Fragment {
     private Context mContext;
     private String value;
     private EditText editSavedRate, editHoursValue;
+    private int mFilingStatusSelection;
     SharedPreferences.Editor editor;
     SharedPreferences sp;
 
@@ -30,23 +32,38 @@ public class HourlyFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_hourly, null);
         editSavedRate = (EditText) mView.findViewById(R.id.edit_hourly_rate);
         editHoursValue = (EditText) mView.findViewById(R.id.edit_hours_worked);
-        Spinner spinner = (Spinner) mView.findViewById(R.id.filing_status_spinner);
-        status = new String[]{"Single", "Joint", "Married", "Head"};
 
+        //Creates the desired spinner for Filing Status
+        status = new String[]{"Single", "Joint", "Married", "Head"};
+        Spinner spinner = (Spinner) mView.findViewById(R.id.filing_status_spinner_hr);
         PayFragmentAdapter myAdapter = new PayFragmentAdapter(mContext, status);
         spinner.setAdapter(myAdapter);
 
+        //Inputs the last input hourly rate into its EditText box
         sp = getActivity().getSharedPreferences("Hourly Rate", Context.MODE_PRIVATE);
         value = sp.getString("Hourly Rate", "");
         if (!value.equals("")) {
             editSavedRate.setText("" + sp.getString("Hourly Rate", ""));
         }
 
+        //Inputs the last input amount of hours worked into its EditText box
         sp = getActivity().getSharedPreferences("Hours Worked", Context.MODE_PRIVATE);
         value = sp.getString("Hours Worked", "");
         if (!value.equals("")) {
             editHoursValue.setText("" + sp.getString("Hours Worked", ""));
         }
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                mFilingStatusSelection = parent.getSelectedItemPosition();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                //do nothing
+            }
+        });
 
         return mView;
     }
@@ -55,28 +72,34 @@ public class HourlyFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
+        //Stores entered hourly rate value into preferences
         String hourlyR = editSavedRate.getText().toString();
-        String hours = editHoursValue.getText().toString();
-
         if (hourlyR != null && !hourlyR.equals("")) {
             sp = getActivity().getSharedPreferences("Hourly Rate", Context.MODE_PRIVATE);
             editor = sp.edit();
             value = editSavedRate.getText().toString();
             editor.putString("Hourly Rate", value);
             editor.commit();
-//            savedRateValue = Double.parseDouble(hourlyR);
-//            outState.putDouble("hourlyRateInput", savedRateValue);
-
         }
+
+        //Stores entered hours worked value into preferences
+        String hours = editHoursValue.getText().toString();
         if (hours != null && !hours.equals("")) {
             sp = getActivity().getSharedPreferences("Hours Worked", Context.MODE_PRIVATE);
             editor = sp.edit();
-            value = editSavedRate.getText().toString();
+            value = editHoursValue.getText().toString();
             editor.putString("Hours Worked", value);
             editor.commit();
-//            savedHoursValue = Double.parseDouble(hours);
-//            outState.putDouble("hoursWorkedInput", savedHoursValue);
         }
+    }
+
+    public int getSelection() {
+        return mFilingStatusSelection;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 
 

@@ -1,5 +1,7 @@
 package com.michaelt.paycheckmileagecalculator;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
@@ -7,9 +9,11 @@ import com.michaelt.paycheckmileagecalculator.adapter.PagerAdapter;
 import com.michaelt.paycheckmileagecalculator.adapter.PayFragmentCoordinator;
 
 
-public class MainActivity extends FragmentActivity implements PayFragmentCoordinator{
+public class MainActivity extends FragmentActivity {
 
     ViewPager mViewPager;
+    SharedPreferences.Editor editor;
+    SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,18 +22,5 @@ public class MainActivity extends FragmentActivity implements PayFragmentCoordin
         mViewPager = (ViewPager) findViewById(R.id.pager);
         PagerAdapter mPagerAdapter = new PagerAdapter(getSupportFragmentManager(), this);
         mViewPager.setAdapter(mPagerAdapter);
-    }
-
-    @Override
-    public void onSelectedItem(String item) {
-//        FragmentManager fm = getSupportFragmentManager();
-
-
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        System.out.println("Destroyed Destroyed Destroyed Destroyed");
     }
 }

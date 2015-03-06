@@ -1,6 +1,8 @@
 package com.michaelt.paycheckmileagecalculator.fragment;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -38,33 +40,39 @@ public class PaycheckInputFragment extends Fragment {
     private ArrayMap<String, Integer> mStandardDeduction;
     double[] mSingleFederalTaxBracket, mJointFederalTaxBracket, mMarriedFederalTaxBracket,
              mTaxBracketRates, mHeadFederalTaxBracket;
-    private double mIncomeTax, savedGrossValue, savedRateValue, savedHoursValue;
+    private double mIncomeTax, mFederalTax, mMedTax, mSSTax;
+    private boolean isRotating;
+    SharedPreferences.Editor editor;
+    SharedPreferences sp;
 
-    private boolean isFirst = true;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mContext = getActivity().getApplicationContext();
         mView = inflater.inflate(R.layout.paycheck_input_fragment, null);
+        sp = getActivity().getSharedPreferences("Rotating", Context.MODE_PRIVATE);
+        boolean isRotating = sp.getBoolean("Rotating", false);
+
         createData();
 
-        mHourlyFragment = new HourlyFragment();
-        mSalaryFragment = new SalaryFragment();
         mButton = (Button) mView.findViewById(R.id.calculate_button);
         mFedTaxView = (TextView) mView.findViewById(R.id.federal_tax_value);
         mMedTaxView = (TextView) mView.findViewById(R.id.medicare_tax_value);
         mSSTaxView = (TextView) mView.findViewById(R.id.social_security_tax_value);
         mStateTaxView = (TextView) mView.findViewById(R.id.state_income_tax_value);
 
-        mFragTag = "Salary";
         createListeners();
-
         return mView;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        sp = getActivity().getSharedPreferences("Rotating", Context.MODE_PRIVATE);
+        editor = sp.edit();
+        editor.putBoolean("Rotating", true);
+        editor.commit();
     }
 
     /**
@@ -89,20 +97,80 @@ public class PaycheckInputFragment extends Fragment {
         mPaySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!isRotating) {
+                    mFragTag = parent.getSelectedItem().toString();
+                }  else {
+                    sp = getActivity().getSharedPreferences("Current Fragment", Context.MODE_PRIVATE);
+                    mFragTag = sp.getString("Current Fragment", "First");
+                }
+
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                FragmentTransaction ft = fm.beginTransaction();
+
+                if (mFragTag.equals("First") && !isRotating) {
+                    mHourlyFragment = new HourlyFragment();
+                    mFragTag = "Hourly";
+                    ft.add(R.id.pay_fragment_container, mHourlyFragment,mFragTag);
+                    sp = getActivity().getSharedPreferences("Current Fragment", Context.MODE_PRIVATE);
+                    editor = sp.edit();
+                    editor.putString("Current Fragment", mFragTag);
+                    editor.commit();
+                }
+
+                if (mFragTag.equalsIgnoreCase("Salary") && !isRotating) {
+                    mSalaryFragment = new SalaryFragment();
+                    //ft.detach(fm.findFragmentByTag(mFragTag));
+                    mFragTag = "Salary";
+                    ft.replace(R.id.pay_fragment_container, mSalaryFragment, mFragTag);
+                    sp = getActivity().getSharedPreferences("Current Fragment", Context.MODE_PRIVATE);
+                    editor = sp.edit();
+                    editor.putString("Current Fragment", mFragTag);
+                    editor.commit();
+                } else if (!isRotating) {
+                    mHourlyFragment = new HourlyFragment();
+                    //ft.detach(fm.findFragmentByTag(mFragTag));
+                    mFragTag = "Hourly";
+                    ft.replace(R.id.pay_fragment_container, mHourlyFragment, mFragTag);
+                    sp = getActivity().getSharedPreferences("Current Fragment", Context.MODE_PRIVATE);
+                    editor = sp.edit();
+                    editor.putString("Current Fragment", mFragTag);
+                    editor.commit();
+                }
+
+                if (isRotating) {
+                    sp = getActivity().getSharedPreferences("Rotating", Context.MODE_PRIVATE);
+                    editor = sp.edit();
+                    editor.putBoolean("Rotating", false);
+                    editor.commit();
+                }
+
+                ft.commit();
+            }
+
+/*        //onItemSelected Listener for Pay type selection spinner
+        mPaySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 FragmentManager fm = getActivity().getSupportFragmentManager();
                 FragmentTransaction ft = fm.beginTransaction();
                 String tester = mFragTag.toString();
 
-
-                if (tester.equalsIgnoreCase("Hourly")) {
+                if (tester.equalsIgnoreCase("Hourly") && !isFirst) {
                     mFragTag = "Salary";
+                    //mSalaryFragment = new SalaryFragment();
                     ft.replace(R.id.pay_fragment_container, mSalaryFragment);
-                } else {
+                } else if (!isFirst) {
                     mFragTag = "Hourly";
+                    //mHourlyFragment = new HourlyFragment();
                     ft.replace(R.id.pay_fragment_container, mHourlyFragment);
                 }
+
+                if (isFirst) {
+                    ft.add(R.id.pay_fragment_container, mHourlyFragment);
+                    isFirst = false;
+                }
                 ft.commit();
-            }
+            }*/
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -131,9 +199,11 @@ public class PaycheckInputFragment extends Fragment {
                     if(mFlatStateTaxes.get(mSelectedState) != null) {
                         //States with flat tax rates
                         calculateStateIncomeTax(true);
+                        calculateFederalTax(true);
                     } else {
                         //States with varying tax rates
                         calculateStateIncomeTax(false);
+                        calculateFederalTax(true);
                     }
                 }
              }
@@ -161,10 +231,10 @@ public class PaycheckInputFragment extends Fragment {
         mPaySpinner.setAdapter(myPayAdapter);
 
         //Federal Tax Bracket Due Data
-        mSingleFederalTaxBracket = new double[]{922.5,5156.25,18481.25,46075.25,119401.25,119996.25};
-        mJointFederalTaxBracket = new double[]{1845,10312.5,29387.5,51577.5,111324,129996.5};
-        mMarriedFederalTaxBracket = new double[]{922.5,5156.25,14693.75,25788.75,55662,64998.25};
-        mHeadFederalTaxBracket = new double[]{1315,6872.5,26775.5,49192.5,115737,125362};
+        mSingleFederalTaxBracket = new double[]{9225,37450,907750,189300,411500,413200,413201};
+        mJointFederalTaxBracket = new double[]{18450,74900,151200,230450,411500,464850,464850};
+        mMarriedFederalTaxBracket = new double[]{9225,37450,75600,115225,205750,232425,232426};
+        mHeadFederalTaxBracket = new double[]{13150,50200,129600,209850,411500,439000,439001};
         mTaxBracketRates = new double[] {.1, .15, .25, .28, .33, .35, .396};
 
         //Federal Standard Deduction Data
@@ -271,6 +341,75 @@ public class PaycheckInputFragment extends Fragment {
         mStateTaxes.put("Washington D.C.", dc);
     }
 
+    private void calculateFederalTax(boolean isFlat) {
+        double total = 0, deduction = 0;
+        double[] filingInformation = new double[0];
+        double[] subtractInformation = new double[0];
+        int filingStatusIndex = 0, count = 0;
+
+        if (mFragTag.equals("Salary")) {
+            filingStatusIndex = mSalaryFragment.getSelection();
+            grossPay = (EditText) mView.findViewById(R.id.edit_gross_pay);
+            total = Double.parseDouble(grossPay.getText().toString());
+            filingStatusIndex = mSalaryFragment.getSelection();
+        } else {
+            filingStatusIndex = mHourlyFragment.getSelection();
+            hourlyRate = (EditText) mView.findViewById(R.id.edit_hourly_rate);
+            hoursWorked = (EditText) mView.findViewById(R.id.edit_hours_worked);
+            double rate = Double.parseDouble(hourlyRate.getText().toString());
+            double hours = Double.parseDouble(hoursWorked.getText().toString());
+            total = rate * hours * getResources().getInteger(R.integer.pay_periods);
+            filingStatusIndex = mHourlyFragment.getSelection();
+        }
+
+        switch (filingStatusIndex) {
+            case 0:
+                filingInformation = mSingleFederalTaxBracket;
+                subtractInformation = new double[]{922.5,5156.25,18481.25,46075.25,119401.25,119996.25};
+                break;
+            case 1:
+                filingInformation = mJointFederalTaxBracket;
+                subtractInformation = new double[]{1845,10312.5,29387.5,51577.5,111324,129996.5};
+                break;
+            case 2:
+                filingInformation = mMarriedFederalTaxBracket;
+                subtractInformation = new double[]{922.5,5156.25,14693.75,25788.75,55662,64998.25};
+                break;
+            case 3:
+                filingInformation = mHeadFederalTaxBracket;
+                subtractInformation = new double[]{1315,6872.5,26775.5,49192.5,115737,125362};
+                break;
+        }
+
+        double d = 0;
+        d = total + 0;
+        d = d - filingInformation[count];
+
+        while (d > 0) {
+            count++;
+            d = total + 0;
+            d = d - filingInformation[count];
+        }
+
+        d = total + 0;
+        if (count == 0) {
+            mFederalTax = (d * mTaxBracketRates[count]) / getResources().getInteger(R.integer.pay_periods);
+        } else {
+            d = d - filingInformation[count-1];
+            mFederalTax = (subtractInformation[count-1] + (d * mTaxBracketRates[count])) / getResources().getInteger(R.integer.pay_periods);
+        }
+
+        total = total - mFederalTax - mSSTax - mMedTax - mIncomeTax;
+        //Display Federal, Medicare, and Social Security Income Taxes, formatted for US currency
+        displayCurrencyValue(mFedTaxView, mFederalTax);
+        displayCurrencyValue(mMedTaxView, mIncomeTax);
+        displayCurrencyValue(mSSTaxView, mIncomeTax);
+    }
+
+    private double findDeduction(double gross, double rate, double hours, int filingStatusIndex) {
+        return 0;
+    }
+
     /**
      * Calculates and displays State Income Tax for selected state
      *
@@ -280,6 +419,7 @@ public class PaycheckInputFragment extends Fragment {
         double rate = 0, hours = 0, gross = 0, paychecks = 0;
         boolean input = false;
         boolean hrorsal;
+        int payPeriods = getResources().getInteger(R.integer.pay_periods);
 
         if(mFragTag.equals("Hourly"))hrorsal = true;
         else hrorsal = false;
@@ -293,9 +433,7 @@ public class PaycheckInputFragment extends Fragment {
                 hours = Double.parseDouble(hoursWorked.getText().toString());
             } else {
                 grossPay = (EditText) mView.findViewById(R.id.edit_gross_pay);
-                //num_paychecks = (EditText) mView.findViewById(R.id.edit_num_paychecks);
                 gross = Double.parseDouble(grossPay.getText().toString());
-                paychecks = Double.parseDouble(num_paychecks.getText().toString());
             }
             input = true;
         } catch (NumberFormatException e) {
@@ -326,8 +464,8 @@ public class PaycheckInputFragment extends Fragment {
         //Calculates State Income Tax at Flat Rate OR Adjusting Rate (depending on state)
         if(isFlat && input) {
             state_tax = mFlatStateTaxes.get(mSelectedState) / 100;
-            total = (rate * hours * state_tax);
-            System.out.println(rate + " " + hours + " " + state_tax + " " + total);
+            if (hrorsal) total = (rate * hours * state_tax);
+            else total = gross * state_tax;
         } else if (input) {
             double[] state_info = mStateTaxes.get(mSelectedState);
             //The dollar range of each tax bracket (estimated)
@@ -345,7 +483,7 @@ public class PaycheckInputFragment extends Fragment {
             //For calculation purposes, works with maxSteps
             int count = 0;
             //Initialize gross amount of money this person can make
-            if (hrorsal) d = (rate * hours * R.integer.pay_periods);
+            if (hrorsal) d = (rate * hours * payPeriods);
             else d = gross;
 
             //Subtract lowest tax bracket cap amount
@@ -359,16 +497,16 @@ public class PaycheckInputFragment extends Fragment {
             }
 
             //Reaffirm dummy variable for gross income
-            if (hrorsal) d = (rate * hours * R.integer.pay_periods);
+            if (hrorsal) d = (rate * hours * payPeriods);
             else d = gross;
 
             //Calculate State Income Tax
             if (count == 0) {
-                total = (d * stateTax) / R.integer.pay_periods;
+                total = (d * stateTax) / payPeriods;
             } else {
                 d = d - stateBracket;
                 total = stateBracket * stateTax;
-                while (count > 0) {
+                while (count > 0 && (d - incomeBracketSteps) > 0) {
                     count--;
                     stateTax = stateTax + taxRateSteps;
                     d = d - incomeBracketSteps;
@@ -376,11 +514,11 @@ public class PaycheckInputFragment extends Fragment {
                 }
                 stateTax = stateTax + taxRateSteps;
                 total = total + (d * stateTax);
-                total = total / getResources().getInteger(R.integer.pay_periods);
             }
 
         }
         //Display State Income Tax, formatted for US currency
+        total = total / payPeriods;
         mIncomeTax = total + 0;
         displayCurrencyValue(mStateTaxView, mIncomeTax);
     }
@@ -394,5 +532,55 @@ public class PaycheckInputFragment extends Fragment {
     private void displayCurrencyValue(TextView container, double value) {
         NumberFormat nf = DecimalFormat.getCurrencyInstance(Locale.US);
         container.setText(nf.format(value));
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 }

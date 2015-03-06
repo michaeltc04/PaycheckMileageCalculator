@@ -23,9 +23,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
             case 0:
                 //((Activity) mContext).findViewById(R.id.pager_tab_strip).setBackgroundColor(R.color.green);
                 return new PaycheckInputFragment();
-            case 1:
+            //case 1:
                 //((Activity) mContext).findViewById(R.id.pager_tab_strip).setBackgroundColor(R.color.red);
-                return new SalaryFragment();
+                //return new SalaryFragment();
             default:
                 break;
         }
@@ -34,7 +34,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 1;
     }
 
     @Override
