@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.michaelt.paycheckmileagecalculator.fragment.EfficiencyFragment;
 import com.michaelt.paycheckmileagecalculator.fragment.PaycheckInputFragment;
 import com.michaelt.paycheckmileagecalculator.fragment.SalaryFragment;
 
@@ -23,9 +24,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
             case 0:
                 //((Activity) mContext).findViewById(R.id.pager_tab_strip).setBackgroundColor(R.color.green);
                 return new PaycheckInputFragment();
-            //case 1:
+            case 1:
                 //((Activity) mContext).findViewById(R.id.pager_tab_strip).setBackgroundColor(R.color.red);
-                //return new SalaryFragment();
+                return new EfficiencyFragment();
             default:
                 break;
         }
@@ -34,7 +35,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 1;
+        return 2;
     }
 
     @Override

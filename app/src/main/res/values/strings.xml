@@ -22,4 +22,11 @@
     <string name="salary">Salary</string>
     <string name="state_income_tax">State Income Tax</string>
     <string name="estimated_pay">Estimated Pay:</string>
+    <string name="efficiency">Engine Efficiency</string>
+    <string name="mpg_view">MPG</string>
+    <string name="gallons_purchased">Gallons Purchased</string>
+    <string name="gas_cost">Gasoline Cost</string>
+    <string name="current_mileage">Current Mileage</string>
+    <string name="gasoline_button">Calculate Mileage</string>
+    <string name="amount_purchased">Amount Purchased</string>
 </resources>

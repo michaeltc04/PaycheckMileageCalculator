@@ -33,8 +33,8 @@ public class PaycheckInputFragment extends Fragment {
     private HourlyFragment mHourlyFragment;
     private SalaryFragment mSalaryFragment;
     private Button mButton;
-    private TextView mFedTaxView, mMedTaxView, mSSTaxView, mStateTaxView;
-    private EditText hourlyRate, hoursWorked, grossPay, num_paychecks;
+    private TextView mFedTaxView, mMedTaxView, mSSTaxView, mStateTaxView, mEstimatedPayView;
+    private EditText hourlyRate, hoursWorked, grossPay;
     private ArrayMap<String, Double> mFlatStateTaxes;
     private ArrayMap<String, double[]> mStateTaxes;
     private ArrayMap<String, Integer> mStandardDeduction;
@@ -61,6 +61,7 @@ public class PaycheckInputFragment extends Fragment {
         mMedTaxView = (TextView) mView.findViewById(R.id.medicare_tax_value);
         mSSTaxView = (TextView) mView.findViewById(R.id.social_security_tax_value);
         mStateTaxView = (TextView) mView.findViewById(R.id.state_income_tax_value);
+        mEstimatedPayView = (TextView) mView.findViewById(R.id.paycheck_amount_value);
 
         createListeners();
         return mView;
@@ -195,15 +196,16 @@ public class PaycheckInputFragment extends Fragment {
                         mSelectedState.equals("Tennessee")) {
                     mIncomeTax = 0;
                     displayCurrencyValue(mStateTaxView, mIncomeTax);
+                    calculateFederalTax();
                 } else {
                     if(mFlatStateTaxes.get(mSelectedState) != null) {
                         //States with flat tax rates
                         calculateStateIncomeTax(true);
-                        calculateFederalTax(true);
+                        calculateFederalTax();
                     } else {
                         //States with varying tax rates
                         calculateStateIncomeTax(false);
-                        calculateFederalTax(true);
+                        calculateFederalTax();
                     }
                 }
              }
@@ -341,11 +343,12 @@ public class PaycheckInputFragment extends Fragment {
         mStateTaxes.put("Washington D.C.", dc);
     }
 
-    private void calculateFederalTax(boolean isFlat) {
+    private void calculateFederalTax() {
         double total = 0, deduction = 0;
         double[] filingInformation = new double[0];
         double[] subtractInformation = new double[0];
         int filingStatusIndex = 0, count = 0;
+        int payPeriods = getResources().getInteger(R.integer.pay_periods);
 
         if (mFragTag.equals("Salary")) {
             filingStatusIndex = mSalaryFragment.getSelection();
@@ -365,19 +368,19 @@ public class PaycheckInputFragment extends Fragment {
         switch (filingStatusIndex) {
             case 0:
                 filingInformation = mSingleFederalTaxBracket;
-                subtractInformation = new double[]{922.5,5156.25,18481.25,46075.25,119401.25,119996.25};
+                subtractInformation = new double[]{922.5, 5156.25, 18481.25, 46075.25, 119401.25, 119996.25};
                 break;
             case 1:
                 filingInformation = mJointFederalTaxBracket;
-                subtractInformation = new double[]{1845,10312.5,29387.5,51577.5,111324,129996.5};
+                subtractInformation = new double[]{1845, 10312.5, 29387.5, 51577.5, 111324, 129996.5};
                 break;
             case 2:
                 filingInformation = mMarriedFederalTaxBracket;
-                subtractInformation = new double[]{922.5,5156.25,14693.75,25788.75,55662,64998.25};
+                subtractInformation = new double[]{922.5, 5156.25, 14693.75, 25788.75, 55662, 64998.25};
                 break;
             case 3:
                 filingInformation = mHeadFederalTaxBracket;
-                subtractInformation = new double[]{1315,6872.5,26775.5,49192.5,115737,125362};
+                subtractInformation = new double[]{1315, 6872.5, 26775.5, 49192.5, 115737, 125362};
                 break;
         }
 
@@ -393,21 +396,42 @@ public class PaycheckInputFragment extends Fragment {
 
         d = total + 0;
         if (count == 0) {
-            mFederalTax = (d * mTaxBracketRates[count]) / getResources().getInteger(R.integer.pay_periods);
+            mFederalTax = (d * mTaxBracketRates[count]) / payPeriods;
         } else {
-            d = d - filingInformation[count-1];
-            mFederalTax = (subtractInformation[count-1] + (d * mTaxBracketRates[count])) / getResources().getInteger(R.integer.pay_periods);
+            d = d - filingInformation[count - 1];
+            mFederalTax = (subtractInformation[count - 1] + (d * mTaxBracketRates[count])) / payPeriods;
         }
 
+        d = total + 0;
+        if (d < 118500) {
+            mSSTax = d * .062;
+        } else {
+            mSSTax = 118500 * .062;
+        }
+        mSSTax = mSSTax / payPeriods;
+
+        if (filingStatusIndex == 0 && d > 200000) {
+            d = total + 0 - 200000;
+            mMedTax = ((200000 * .0145) + (d * .009)) / payPeriods;
+        } else if (filingStatusIndex == 1 && d > 250000) {
+            d = total + 0 - 250000;
+            mMedTax = ((250000 * .0145) + (d * .009)) / payPeriods;
+        } else if (filingStatusIndex == 2 && d > 125000) {
+            d = total + 0 - 125000;
+            mMedTax = ((125000 * .0145) + (d * .009)) / payPeriods;
+        } else {
+            d = total + 0;
+            mMedTax = (d * .0145) / payPeriods;
+        }
+
+        total = total / payPeriods;
         total = total - mFederalTax - mSSTax - mMedTax - mIncomeTax;
+
         //Display Federal, Medicare, and Social Security Income Taxes, formatted for US currency
         displayCurrencyValue(mFedTaxView, mFederalTax);
-        displayCurrencyValue(mMedTaxView, mIncomeTax);
-        displayCurrencyValue(mSSTaxView, mIncomeTax);
-    }
-
-    private double findDeduction(double gross, double rate, double hours, int filingStatusIndex) {
-        return 0;
+        displayCurrencyValue(mMedTaxView, mMedTax);
+        displayCurrencyValue(mSSTaxView, mSSTax);
+        displayCurrencyValue(mEstimatedPayView, total);
     }
 
     /**
