@@ -1,5 +1,6 @@
 package com.michaelt.paycheckmileagecalculator.fragment;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -70,23 +71,32 @@ public class EfficiencyFragment extends Fragment {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            //mCurrentDistanceValue.setText("4140");
-            //mGasolinePurchasedValue.setText("15");
-            //mCostValue.setText("44.85");
-            mCurrentDistance = Double.parseDouble(mCurrentDistanceValue.getText().toString());
-            mGasolinePurchased = Double.parseDouble(mGasolinePurchasedValue.getText().toString());
-            mTotalCost = Double.parseDouble(mCostValue.getText().toString());
 
-            //Save total cost
-            sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
-            int d = new Double(mTotalCost + (sp.getInt("Total Cost", 0))/100).intValue();
-            editor = sp.edit();
-            editor.putInt("Total Cost", d);
-            calculateEfficiency();
+                if (isEmpty(mCurrentDistanceValue) |
+                        isEmpty(mGasolinePurchasedValue) |
+                        isEmpty(mCostValue)) {
 
-            mCurrentDistanceValue.setText("");
-            mGasolinePurchasedValue.setText("");
-            mCostValue.setText("");
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Cannot leave boxes blank!").setTitle("Improper Input");
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+                } else {
+                    mCurrentDistance = Double.parseDouble(mCurrentDistanceValue.getText().toString());
+                    mGasolinePurchased = Double.parseDouble(mGasolinePurchasedValue.getText().toString());
+                    mTotalCost = Double.parseDouble(mCostValue.getText().toString());
+
+                    //Save total cost
+                    sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
+                    int d = new Double(mTotalCost + (sp.getInt("Total Cost", 0))/100).intValue();
+                    editor = sp.edit();
+                    editor.putInt("Total Cost", d);
+                    calculateEfficiency();
+
+                    mCurrentDistanceValue.setText("");
+                    mGasolinePurchasedValue.setText("");
+                    mCostValue.setText("");
+                }
             }
         });
         return mView;
@@ -155,5 +165,15 @@ public class EfficiencyFragment extends Fragment {
         editor = sp.edit();
         editor.putInt("Previous Amount Purchased", gp);
         editor.commit();
+    }
+
+
+    /**
+     * Checks to see if the EditText is empty of text
+     * @param mEditText The EditText that is being tested
+     * @return False if not empty, True if empty
+     */
+    private boolean isEmpty(EditText mEditText) {
+        return mEditText.getText().toString().trim().length() == 0;
     }
 }

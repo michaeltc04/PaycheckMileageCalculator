@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.util.ArrayMap;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -148,31 +149,6 @@ public class PaycheckInputFragment extends Fragment {
                 ft.commit();
             }
 
-/*        //onItemSelected Listener for Pay type selection spinner
-        mPaySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                FragmentManager fm = getActivity().getSupportFragmentManager();
-                FragmentTransaction ft = fm.beginTransaction();
-                String tester = mFragTag.toString();
-
-                if (tester.equalsIgnoreCase("Hourly") && !isFirst) {
-                    mFragTag = "Salary";
-                    //mSalaryFragment = new SalaryFragment();
-                    ft.replace(R.id.pay_fragment_container, mSalaryFragment);
-                } else if (!isFirst) {
-                    mFragTag = "Hourly";
-                    //mHourlyFragment = new HourlyFragment();
-                    ft.replace(R.id.pay_fragment_container, mHourlyFragment);
-                }
-
-                if (isFirst) {
-                    ft.add(R.id.pay_fragment_container, mHourlyFragment);
-                    isFirst = false;
-                }
-                ft.commit();
-            }*/
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 //do nothing
@@ -184,6 +160,22 @@ public class PaycheckInputFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
+                boolean flag = true;
+
+                //Find out if desired inputs are empty
+                if (mFragTag.equals(getResources().getString(R.string.hourly))) {
+                    hourlyRate = (EditText) mView.findViewById(R.id.edit_hourly_rate);
+                    hoursWorked = (EditText) mView.findViewById(R.id.edit_hours_worked);
+                    if (isEmpty(hourlyRate) | isEmpty(hoursWorked)) {
+                        flag = false;
+                    }
+                } else {
+                    grossPay = (EditText) mView.findViewById(R.id.edit_gross_pay);
+                    if (isEmpty(grossPay)) {
+                        flag = false;
+                    }
+                }
+
                 //States without income tax
                 if (mSelectedState.equals("Alaska") |
                         mSelectedState.equals("Florida") |
@@ -193,11 +185,11 @@ public class PaycheckInputFragment extends Fragment {
                         mSelectedState.equals("Washington") |
                         mSelectedState.equals("Wyoming") |
                         mSelectedState.equals("New Hampshire") |
-                        mSelectedState.equals("Tennessee")) {
+                        mSelectedState.equals("Tennessee") && flag) {
                     mIncomeTax = 0;
                     displayCurrencyValue(mStateTaxView, mIncomeTax);
                     calculateFederalTax();
-                } else {
+                } else if (flag) {
                     if(mFlatStateTaxes.get(mSelectedState) != null) {
                         //States with flat tax rates
                         calculateStateIncomeTax(true);
@@ -207,9 +199,27 @@ public class PaycheckInputFragment extends Fragment {
                         calculateStateIncomeTax(false);
                         calculateFederalTax();
                     }
+                //Show alert dialog instead of calculating due to insufficient input
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Cannot leave boxes blank!").setTitle("Improper Input");
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
              }
         });
+    }
+
+    /**
+     * Checks to see if the EditText is empty of text
+     * @param mEditText The EditText that is being tested
+     * @return False if not empty, True if empty
+     */
+    private boolean isEmpty(EditText mEditText) {
+        Editable editable = mEditText.getText();
+        String arf = editable.toString();
+        boolean test = arf.trim().length() == 0;
+        return test;
     }
 
     /**
@@ -352,15 +362,12 @@ public class PaycheckInputFragment extends Fragment {
 
         if (mFragTag.equals("Salary")) {
             filingStatusIndex = mSalaryFragment.getSelection();
-            grossPay = (EditText) mView.findViewById(R.id.edit_gross_pay);
             total = Double.parseDouble(grossPay.getText().toString());
             filingStatusIndex = mSalaryFragment.getSelection();
             payPeriods = 24;
         } else {
             payPeriods = getResources().getInteger(R.integer.pay_periods);
             filingStatusIndex = mHourlyFragment.getSelection();
-            hourlyRate = (EditText) mView.findViewById(R.id.edit_hourly_rate);
-            hoursWorked = (EditText) mView.findViewById(R.id.edit_hours_worked);
             double rate = Double.parseDouble(hourlyRate.getText().toString());
             double hours = Double.parseDouble(hoursWorked.getText().toString());
             total = rate * hours * payPeriods;
