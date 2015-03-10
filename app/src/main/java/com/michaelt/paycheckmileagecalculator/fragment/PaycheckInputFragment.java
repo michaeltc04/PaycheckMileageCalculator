@@ -348,20 +348,22 @@ public class PaycheckInputFragment extends Fragment {
         double[] filingInformation = new double[0];
         double[] subtractInformation = new double[0];
         int filingStatusIndex = 0, count = 0;
-        int payPeriods = getResources().getInteger(R.integer.pay_periods);
+        int payPeriods = 0;
 
         if (mFragTag.equals("Salary")) {
             filingStatusIndex = mSalaryFragment.getSelection();
             grossPay = (EditText) mView.findViewById(R.id.edit_gross_pay);
             total = Double.parseDouble(grossPay.getText().toString());
             filingStatusIndex = mSalaryFragment.getSelection();
+            payPeriods = 24;
         } else {
+            payPeriods = getResources().getInteger(R.integer.pay_periods);
             filingStatusIndex = mHourlyFragment.getSelection();
             hourlyRate = (EditText) mView.findViewById(R.id.edit_hourly_rate);
             hoursWorked = (EditText) mView.findViewById(R.id.edit_hours_worked);
             double rate = Double.parseDouble(hourlyRate.getText().toString());
             double hours = Double.parseDouble(hoursWorked.getText().toString());
-            total = rate * hours * getResources().getInteger(R.integer.pay_periods);
+            total = rate * hours * payPeriods;
             filingStatusIndex = mHourlyFragment.getSelection();
         }
 
@@ -446,7 +448,10 @@ public class PaycheckInputFragment extends Fragment {
         int payPeriods = getResources().getInteger(R.integer.pay_periods);
 
         if(mFragTag.equals("Hourly"))hrorsal = true;
-        else hrorsal = false;
+        else {
+            hrorsal = false;
+            payPeriods = 24;
+        }
 
         //Catches possible improper input by the user (NumberFormatException)
         try {

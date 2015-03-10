@@ -29,7 +29,7 @@ public class EfficiencyFragment extends Fragment {
     private TextView mEfficiency, mEfficiencyPercentage;
     private EditText mCurrentDistanceValue, mGasolinePurchasedValue, mCostValue;
     private double mCurrentDistance, mGasolinePurchased, mTotalCost;
-    private Button mButton;
+    private Button mButton, mClearButton;
     SharedPreferences sp;
     SharedPreferences.Editor editor;
 
@@ -41,60 +41,119 @@ public class EfficiencyFragment extends Fragment {
         mGasolinePurchasedValue = (EditText) mView.findViewById(R.id.amount_purchased_value);
         mCostValue = (EditText) mView.findViewById(R.id.gas_cost_value);
         mButton = (Button) mView.findViewById(R.id.efficiency_calculate);
+        mClearButton = (Button) mView.findViewById(R.id.clear_button);
         mEfficiency = (TextView) mView.findViewById(R.id.mpg_view_value);
         mEfficiencyPercentage = (TextView) mView.findViewById(R.id.efficiency_value);
+
+        mClearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sp = getActivity().getSharedPreferences("Previous Distance", Context.MODE_PRIVATE);
+                editor = sp.edit();
+                editor.putInt("Previous Distance", -1);
+                editor.commit();
+                sp = getActivity().getSharedPreferences("Efficiency", Context.MODE_PRIVATE);
+                editor = sp.edit();
+                editor.putInt("Efficiency", -1);
+                editor.commit();
+                sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
+                editor = sp.edit();
+                editor.putInt("Total Cost", -1);
+                editor.commit();
+                sp = getActivity().getSharedPreferences("Previous Amount Purchased", Context.MODE_PRIVATE);
+                editor = sp.edit();
+                editor.putInt("Previous Amount Purchased", -1);
+                editor.commit();
+            }
+        });
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mCurrentDistanceValue.setText("4140");
-                mGasolinePurchasedValue.setText("15");
-                mCostValue.setText("44.85");
+            //mCurrentDistanceValue.setText("4140");
+            //mGasolinePurchasedValue.setText("15");
+            //mCostValue.setText("44.85");
+            mCurrentDistance = Double.parseDouble(mCurrentDistanceValue.getText().toString());
+            mGasolinePurchased = Double.parseDouble(mGasolinePurchasedValue.getText().toString());
+            mTotalCost = Double.parseDouble(mCostValue.getText().toString());
 
-                mCurrentDistance = Double.parseDouble(mCurrentDistanceValue.getText().toString());
-                mGasolinePurchased = Double.parseDouble(mGasolinePurchasedValue.getText().toString());
-                mTotalCost = Double.parseDouble(mCostValue.getText().toString());
-                sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
-                int d = new Double(mTotalCost + (sp.getInt("Total Cost", 0))/100).intValue();
-                editor = sp.edit();
-                editor.putInt("Total Cost", d);
-                //editor.putInt("Total Cost", 0);
-                calculateEfficiency();
+            //Save total cost
+            sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
+            int d = new Double(mTotalCost + (sp.getInt("Total Cost", 0))/100).intValue();
+            editor = sp.edit();
+            editor.putInt("Total Cost", d);
+            calculateEfficiency();
+
+            mCurrentDistanceValue.setText("");
+            mGasolinePurchasedValue.setText("");
+            mCostValue.setText("");
             }
         });
         return mView;
     }
 
     private void calculateEfficiency() {
+        double oldEfficiency = 0, newEfficiency = 0, oldDistance = 0, currentPercentage = 0, oldAmount = 0;
 
         //mpg = new mileage - old mileage / old gallons purchased
         //effic% = new mpg / old mpg
-
-        boolean flag = true;
         sp = getActivity().getSharedPreferences("Previous Distance", Context.MODE_PRIVATE);
-        double oldDistance = sp.getInt("Previous Distance", 0);
+        oldDistance = sp.getInt("Previous Distance", -1);
         sp = getActivity().getSharedPreferences("Efficiency", Context.MODE_PRIVATE);
-        double oldEfficiency = sp.getInt("Efficiency", 0) / 100;
-        if (oldDistance == 0) flag = false;
-        oldDistance = 3900;
-        oldEfficiency = 16;
+        oldEfficiency = sp.getInt("Efficiency", -1);
+        sp = getActivity().getSharedPreferences("Previous Amount Purchased", Context.MODE_PRIVATE);
+        oldAmount = sp.getInt("Previous Amount Purchased", -1);
 
-        double newEfficiency = (mCurrentDistance - oldDistance) / mGasolinePurchased;
-        double currentPercentage = newEfficiency / oldEfficiency;
+        NumberFormat nf = new DecimalFormat("0.##");
 
-        if (currentPercentage < 0) {
+        //First run through after fresh data
+        if (oldDistance == -1 || oldEfficiency == -1 || oldAmount == -1) {
+            oldDistance = 0;
+            currentPercentage = 0;
+            newEfficiency = 100;
+            mEfficiencyPercentage.setText("TBD");
+            mEfficiencyPercentage.setText("TBD");
+
+        //All following runs
+        } else {
+            newEfficiency = (mCurrentDistance - oldDistance) / oldAmount;
+
+            if (oldEfficiency == 100) {
+                currentPercentage = 0;
+                mEfficiencyPercentage.setText("TBD");
+            } else {
+                currentPercentage = newEfficiency / oldEfficiency;
+                mEfficiencyPercentage.setText("" + nf.format(currentPercentage * 100) + "%");
+            }
+            mEfficiency.setText("" + nf.format(newEfficiency));
+
+        }
+
+        if (currentPercentage < 1) {
             mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.red));
         } else {
             mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.green));
         }
 
-        NumberFormat nf = new DecimalFormat("00.##");
-        mEfficiency.setText("" + nf.format(newEfficiency));
-        mEfficiencyPercentage.setText("" + nf.format(currentPercentage) + "%");
+        //save current efficiency
+        int ne = new Double(newEfficiency).intValue();
+        sp = getActivity().getSharedPreferences("Efficiency", Context.MODE_PRIVATE);
+        editor = sp.edit();
+        editor.putInt("Efficiency", ne);
+        editor.commit();
 
-        //sp = getActivity().getSharedPreferences("Efficiency", );
-//        sp = getActivity().getSharedPreferences("Previous Distance", Context.MODE_PRIVATE);
-//        sp = getActivity().getSharedPreferences("Efficiency", Context.MODE_PRIVATE);
-//        sp = getActivity().getSharedPreferences("Efficiency Percentage", Context.MODE_PRIVATE);
+        //save current distance
+        int cd = new Double(mCurrentDistance).intValue();
+        sp = getActivity().getSharedPreferences("Previous Distance", Context.MODE_PRIVATE);
+        editor = sp.edit();
+        editor.putInt("Previous Distance", cd);
+        editor.commit();
+
+        //save current amount of gasoline purchased
+        int gp = new Double(mGasolinePurchased).intValue();
+        sp = getActivity().getSharedPreferences("Previous Amount Purchased", Context.MODE_PRIVATE);
+        editor = sp.edit();
+        editor.putInt("Previous Amount Purchased", gp);
+        editor.commit();
     }
 }

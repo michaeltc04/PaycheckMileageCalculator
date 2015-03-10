@@ -29,4 +29,5 @@
     <string name="current_mileage">Current Mileage</string>
     <string name="gasoline_button">Calculate Mileage</string>
     <string name="amount_purchased">Amount Purchased</string>
+    <string name="clear_button">Clear Data</string>
 </resources>
