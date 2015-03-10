@@ -27,7 +27,7 @@ public class EfficiencyFragment extends Fragment {
 
     private Context mContext;
     private View mView;
-    private TextView mEfficiency, mEfficiencyPercentage;
+    private TextView mEfficiency, mEfficiencyPercentage, mPreviousDistance, mPreviousAmount, mPreviousCost;
     private EditText mCurrentDistanceValue, mGasolinePurchasedValue, mCostValue;
     private double mCurrentDistance, mGasolinePurchased, mTotalCost;
     private Button mButton, mClearButton;
@@ -45,6 +45,11 @@ public class EfficiencyFragment extends Fragment {
         mClearButton = (Button) mView.findViewById(R.id.clear_button);
         mEfficiency = (TextView) mView.findViewById(R.id.mpg_view_value);
         mEfficiencyPercentage = (TextView) mView.findViewById(R.id.efficiency_value);
+
+        mPreviousDistance = (TextView) mView.findViewById(R.id.previous_current_mileage);
+        mPreviousAmount = (TextView) mView.findViewById(R.id.previous_amount_purchased);
+        mPreviousCost = (TextView) mView.findViewById(R.id.previous_gas_cost);
+        displayPreviousValues();
 
         mClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +70,11 @@ public class EfficiencyFragment extends Fragment {
                 editor = sp.edit();
                 editor.putInt("Previous Amount Purchased", -1);
                 editor.commit();
+                mEfficiency.setText("");
+                mEfficiencyPercentage.setText("TBD");
+                mPreviousAmount.setText("");
+                mPreviousCost.setText("");
+                mPreviousDistance.setText("");
             }
         });
 
@@ -88,9 +98,12 @@ public class EfficiencyFragment extends Fragment {
 
                     //Save total cost
                     sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
-                    int d = new Double(mTotalCost + (sp.getInt("Total Cost", 0))/100).intValue();
+                    double d = sp.getInt("Total Cost", 0);
+                    d = d / 100;
+                    d = mTotalCost + d;
                     editor = sp.edit();
-                    editor.putInt("Total Cost", d);
+                    editor.putInt("Total Cost", new Double((d * 100)).intValue());
+                    editor.commit();
                     calculateEfficiency();
 
                     mCurrentDistanceValue.setText("");
@@ -100,6 +113,36 @@ public class EfficiencyFragment extends Fragment {
             }
         });
         return mView;
+    }
+
+    public void displayPreviousValues() {
+        double d;
+        NumberFormat nf = new DecimalFormat("0.##");
+
+        sp = getActivity().getSharedPreferences("Efficiency", Context.MODE_PRIVATE);
+        d = sp.getInt("Efficiency", -1);
+        if (d != -1) {
+            mEfficiency.setText("" + nf.format(d / 100));
+        }
+
+        sp = getActivity().getSharedPreferences("Previous Distance", Context.MODE_PRIVATE);
+        d = sp.getInt("Previous Distance", -1);
+        if (d != -1) {
+            mPreviousDistance.setText("" + nf.format(d));
+        }
+
+        sp = getActivity().getSharedPreferences("Previous Amount Purchased", Context.MODE_PRIVATE);
+        d = sp.getInt("Previous Amount Purchased", -1);
+        if (d != -1) {
+            mPreviousAmount.setText("" + nf.format(d));
+        }
+
+        sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
+        d = sp.getInt("Total Cost", -1);
+        if (d != -1) {
+            mPreviousCost.setText("$" + nf.format(d / 100));
+        }
+
     }
 
     private void calculateEfficiency() {
@@ -114,6 +157,8 @@ public class EfficiencyFragment extends Fragment {
         sp = getActivity().getSharedPreferences("Previous Amount Purchased", Context.MODE_PRIVATE);
         oldAmount = sp.getInt("Previous Amount Purchased", -1);
 
+        oldEfficiency = oldEfficiency / 100;
+
         NumberFormat nf = new DecimalFormat("0.##");
 
         //First run through after fresh data
@@ -121,7 +166,7 @@ public class EfficiencyFragment extends Fragment {
             oldDistance = 0;
             currentPercentage = 0;
             newEfficiency = 100;
-            mEfficiencyPercentage.setText("TBD");
+            mEfficiency.setText("TBD");
             mEfficiencyPercentage.setText("TBD");
 
         //All following runs
@@ -146,7 +191,7 @@ public class EfficiencyFragment extends Fragment {
         }
 
         //save current efficiency
-        int ne = new Double(newEfficiency).intValue();
+        int ne = new Double(newEfficiency * 100).intValue();
         sp = getActivity().getSharedPreferences("Efficiency", Context.MODE_PRIVATE);
         editor = sp.edit();
         editor.putInt("Efficiency", ne);
@@ -165,6 +210,8 @@ public class EfficiencyFragment extends Fragment {
         editor = sp.edit();
         editor.putInt("Previous Amount Purchased", gp);
         editor.commit();
+
+        displayPreviousValues();
     }
 
 

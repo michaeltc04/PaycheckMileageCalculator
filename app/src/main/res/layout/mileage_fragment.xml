@@ -6,6 +6,11 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gas"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,11 +38,19 @@
             android:inputType="numberDecimal"/>
 
         <TextView
+            android:id="@+id/previous_current_mileage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/current_mileage"
+            tools:text="$4000"/>
+
+        <TextView
             android:id="@+id/amount_purchased"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/amount_purchased"
-            android:layout_below="@+id/current_mileage"
+            android:layout_below="@+id/previous_current_mileage"
             android:textSize="@dimen/paycheck_text_size"
             android:layout_margin="@dimen/paycheck_text_margin"/>
 
@@ -53,11 +66,19 @@
             android:inputType="numberDecimal"/>
 
         <TextView
+            android:id="@+id/previous_amount_purchased"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/amount_purchased"
+            tools:text="$4000"/>
+
+        <TextView
             android:id="@+id/gas_cost"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/gas_cost"
-            android:layout_below="@+id/amount_purchased"
+            android:layout_below="@+id/previous_amount_purchased"
             android:textSize="@dimen/paycheck_text_size"
             android:layout_margin="@dimen/paycheck_text_margin"/>
 
@@ -71,6 +92,23 @@
             android:background="@color/text_background_color"
             tools:text="RUFF"
             android:inputType="numberDecimal"/>
+
+        <TextView
+            android:id="@+id/previous_gas_cost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/gas_cost"
+            tools:text="$4000"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@id/gas_cost_value"
+            android:layout_alignBaseline="@+id/gas_cost_value"
+            android:textColor="#00aa00"
+            android:text="$"
+            android:textSize="@dimen/paycheck_text_size"/>
 
     </RelativeLayout>
 
