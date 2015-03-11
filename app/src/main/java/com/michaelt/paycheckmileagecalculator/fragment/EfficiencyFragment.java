@@ -33,6 +33,7 @@ public class EfficiencyFragment extends Fragment {
     private Button mButton, mClearButton;
     SharedPreferences sp;
     SharedPreferences.Editor editor;
+    private NumberFormat nf = new DecimalFormat("0.##");
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -64,16 +65,21 @@ public class EfficiencyFragment extends Fragment {
                 editor.commit();
                 sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
                 editor = sp.edit();
-                editor.putInt("Total Cost", -1);
+                editor.putInt("Total Cost", 0);
                 editor.commit();
                 sp = getActivity().getSharedPreferences("Previous Amount Purchased", Context.MODE_PRIVATE);
                 editor = sp.edit();
                 editor.putInt("Previous Amount Purchased", -1);
                 editor.commit();
-                mEfficiency.setText("");
+                sp = getActivity().getSharedPreferences("Efficiency Percentage", Context.MODE_PRIVATE);
+                editor = sp.edit();
+                editor.putInt("Efficiency Percentage", -1);
+                editor.commit();
+                mEfficiency.setText("TBD");
+                mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.primary_text_default_material_light));
                 mEfficiencyPercentage.setText("TBD");
                 mPreviousAmount.setText("");
-                mPreviousCost.setText("");
+                mPreviousCost.setText("$0");
                 mPreviousDistance.setText("");
             }
         });
@@ -117,11 +123,12 @@ public class EfficiencyFragment extends Fragment {
 
     public void displayPreviousValues() {
         double d;
-        NumberFormat nf = new DecimalFormat("0.##");
 
         sp = getActivity().getSharedPreferences("Efficiency", Context.MODE_PRIVATE);
         d = sp.getInt("Efficiency", -1);
-        if (d != -1) {
+        if (d == -1 || d == 10000) {
+            mEfficiency.setText("TBD");
+        } else {
             mEfficiency.setText("" + nf.format(d / 100));
         }
 
@@ -138,9 +145,17 @@ public class EfficiencyFragment extends Fragment {
         }
 
         sp = getActivity().getSharedPreferences("Total Cost", Context.MODE_PRIVATE);
-        d = sp.getInt("Total Cost", -1);
+        d = sp.getInt("Total Cost", 0);
+        mPreviousCost.setText("$" + nf.format(d / 100));
+
+        sp = getActivity().getSharedPreferences("Efficiency Percentage", Context.MODE_PRIVATE);
+        d = sp.getInt("Efficiency Percentage", -1);
         if (d != -1) {
-            mPreviousCost.setText("$" + nf.format(d / 100));
+            if ( d < 10000) mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.red));
+            else mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.green));
+            mEfficiencyPercentage.setText("" + nf.format(d / 100) + "%");
+        } else {
+            mEfficiencyPercentage.setText("TBD");
         }
 
     }
@@ -159,13 +174,13 @@ public class EfficiencyFragment extends Fragment {
 
         oldEfficiency = oldEfficiency / 100;
 
-        NumberFormat nf = new DecimalFormat("0.##");
-
         //First run through after fresh data
         if (oldDistance == -1 || oldEfficiency == -1 || oldAmount == -1) {
             oldDistance = 0;
             currentPercentage = 0;
             newEfficiency = 100;
+            mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.primary_text_default_material_light));
+            mEfficiency.setTextColor(getResources().getColor(R.color.primary_text_default_material_light));
             mEfficiency.setText("TBD");
             mEfficiencyPercentage.setText("TBD");
 
@@ -175,20 +190,28 @@ public class EfficiencyFragment extends Fragment {
 
             if (oldEfficiency == 100) {
                 currentPercentage = 0;
+                mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.primary_text_default_material_light));
                 mEfficiencyPercentage.setText("TBD");
             } else {
-                currentPercentage = newEfficiency / oldEfficiency;
-                mEfficiencyPercentage.setText("" + nf.format(currentPercentage * 100) + "%");
+                currentPercentage = (newEfficiency / oldEfficiency) * 100;
+
+                if (currentPercentage < 100) {
+                    mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.red));
+                } else {
+                    mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.green));
+                }
+                mEfficiencyPercentage.setText("" + nf.format(currentPercentage) + "%");
+
+                int ep = new Double(currentPercentage * 100).intValue();
+                sp = getActivity().getSharedPreferences("Efficiency Percentage", Context.MODE_PRIVATE);
+                editor = sp.edit();
+                editor.putInt("Efficiency Percentage", ep);
+                editor.commit();
             }
             mEfficiency.setText("" + nf.format(newEfficiency));
-
         }
 
-        if (currentPercentage < 1) {
-            mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.red));
-        } else {
-            mEfficiencyPercentage.setTextColor(getResources().getColor(R.color.green));
-        }
+
 
         //save current efficiency
         int ne = new Double(newEfficiency * 100).intValue();
@@ -210,6 +233,8 @@ public class EfficiencyFragment extends Fragment {
         editor = sp.edit();
         editor.putInt("Previous Amount Purchased", gp);
         editor.commit();
+
+
 
         displayPreviousValues();
     }
